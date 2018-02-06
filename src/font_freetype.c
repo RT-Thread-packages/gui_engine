@@ -24,7 +24,7 @@
 
 #include <rtthread.h>
 
-#ifdef RTGUI_USING_TTF
+#ifdef GUIENGINE_USING_TTF
 #include <rtgui/rtgui.h>
 #include <rtgui/rtgui_system.h>
 #include <rtgui/dc.h>
@@ -62,7 +62,7 @@ extern unsigned short ff_convert(unsigned short wch, int direction);
 #define gb2312tounicode(code) ff_convert(code, 1)
 #endif
 
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
 
 static void gbk_to_unicode(rt_uint16_t *unicode, const char *text, int len)
 {
@@ -587,14 +587,14 @@ static void ftc_draw_text(struct rtgui_font *font,
     RT_ASSERT(ttf_font != RT_NULL);
 
     /* allocate unicode buffer */
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     text_short = (rt_uint16_t *)rtgui_malloc((len + 1) * 2);
 #else
     text_short = (rt_uint16_t *)rtgui_malloc((utf8_to_unicode_len(text, len) + 1) * 2);
 #endif
     if (text_short == RT_NULL)
         return; /* out of memory */
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     rt_memset(text_short, 0x00, (len + 1) * 2);
 #else
     rt_memset(text_short, 0x00, (utf8_to_unicode_len(text, len) + 1) * 2);
@@ -603,7 +603,7 @@ static void ftc_draw_text(struct rtgui_font *font,
     RT_ASSERT(rect);
 
     /* convert gbk to unicode */
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     gbk_to_unicode(text_short, text, len);
 #else
     utf8_to_unicode(text_short, text, len);
@@ -716,7 +716,7 @@ static void ftc_get_metrics(struct rtgui_font *font, const char *text, struct rt
     memset(rect, 0, sizeof(struct rtgui_rect));
 
     /* allocate unicode buffer */
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     text_short = (rt_uint16_t *)rtgui_malloc((len + 1) * 2);
 #else
     text_short = (rt_uint16_t *)rtgui_malloc((utf8_to_unicode_len(text, len) + 1) * 2);
@@ -724,14 +724,14 @@ static void ftc_get_metrics(struct rtgui_font *font, const char *text, struct rt
     if (text_short == RT_NULL)
         return; /* out of memory */
 
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     rt_memset(text_short, 0x00, (len + 1) * 2);
 #else
     rt_memset(text_short, 0x00, (utf8_to_unicode_len(text, len) + 1) * 2);
 #endif
 
     /* convert gbk to unicode */
-#ifndef UTF8_TO_UNICODE
+#ifndef GUIENGINE_TTF_UTF8
     gbk_to_unicode(text_short, text, len);
 #else
     utf8_to_unicode(text_short, text, len);

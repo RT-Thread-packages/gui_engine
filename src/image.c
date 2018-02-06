@@ -35,18 +35,18 @@
 #define strncasecmp  strnicmp
 #endif
 
-#ifdef RTGUI_IMAGE_XPM
+#ifdef GUIENGINE_IMAGE_XPM
 extern void rtgui_image_xpm_init(void);
 #endif
 
-#ifdef RTGUI_IMAGE_BMP
+#ifdef GUIENGINE_IMAGE_BMP
 #include <rtgui/image_bmp.h>
 #endif
 
-#if (defined(RTGUI_IMAGE_JPEG) || defined(RTGUI_IMAGE_TJPGD))
+#if (defined(GUIENGINE_IMAGE_JPEG) || defined(GUIENGINE_IMAGE_TJPGD))
 extern void rtgui_image_jpeg_init(void);
 #endif
-#if defined(RTGUI_IMAGE_PNG) || defined(RTGUI_IMAGE_LODEPNG)
+#if defined(GUIENGINE_IMAGE_PNG) || defined(GUIENGINE_IMAGE_LODEPNG)
 extern void rtgui_image_png_init(void);
 #endif
 
@@ -58,23 +58,23 @@ void rtgui_system_image_init(void)
     /* always support HDC image */
     rtgui_image_hdc_init();
 
-#ifdef RTGUI_IMAGE_XPM
+#ifdef GUIENGINE_IMAGE_XPM
     rtgui_image_xpm_init();
 #endif
 
-#ifdef RTGUI_IMAGE_BMP
+#ifdef GUIENGINE_IMAGE_BMP
     rtgui_image_bmp_init();
 #endif
 
-#if (defined(RTGUI_IMAGE_JPEG) || defined(RTGUI_IMAGE_TJPGD))
+#if (defined(GUIENGINE_IMAGE_JPEG) || defined(GUIENGINE_IMAGE_TJPGD))
     rtgui_image_jpeg_init();
 #endif
 
-#if defined(RTGUI_IMAGE_PNG) || defined(RTGUI_IMAGE_LODEPNG)
+#if defined(GUIENGINE_IMAGE_PNG) || defined(GUIENGINE_IMAGE_LODEPNG)
     rtgui_image_png_init();
 #endif
 
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
     /* initialize image container */
     rtgui_system_image_container_init();
 #endif

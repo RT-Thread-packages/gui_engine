@@ -1,4 +1,4 @@
-# RT-Thread building script for gui
+# RT-Thread building script for Gui Engine
 
 from building import *
 

@@ -34,7 +34,7 @@
  * a image resource.
  */
 
-#if defined(RTGUI_IMAGE_CONTAINER) && defined(RTGUI_USING_DFS_FILERW)
+#if defined(GUIENGINE_IMAGE_CONTAINER) && defined(RTGUI_USING_DFS_FILERW)
 typedef unsigned int (*rtgui_hash_func_t)(const void *key);
 typedef struct _rtgui_hash_table  rtgui_hash_table_t;
 typedef rt_bool_t (*rtgui_equal_func_t)(const void *a, const void *b);

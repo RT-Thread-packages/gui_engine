@@ -116,7 +116,7 @@ struct rtgui_dc_buffer
     /* pitch */
     rt_uint16_t pitch;
 
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
     /* image dc */
     struct rtgui_image_item *image_item;
 #endif
@@ -135,7 +135,7 @@ struct rtgui_dc_buffer
 /* create a buffer dc */
 struct rtgui_dc *rtgui_dc_buffer_create(int width, int height);
 struct rtgui_dc *rtgui_dc_buffer_create_pixformat(rt_uint8_t pixel_format, int w, int h);
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
 struct rtgui_dc *rtgui_img_dc_create_pixformat(rt_uint8_t pixel_format, rt_uint8_t *pixel, 
     struct rtgui_image_item *image_item);
 #endif

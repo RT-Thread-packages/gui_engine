@@ -32,7 +32,7 @@ extern "C" {
 #include <rtgui/rtgui.h>
 #include <rtgui/image.h>
 
-#if defined(RTGUI_IMAGE_CONTAINER)
+#if defined(GUIENGINE_IMAGE_CONTAINER)
 /* image item in image container */
 struct rtgui_image_item
 {

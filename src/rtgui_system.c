@@ -32,7 +32,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/window.h>
 
-#ifdef RTGUI_USING_TTF
+#ifdef GUIENGINE_USING_TTF
 #include <rtgui/font_freetype.h>
 #endif
 
@@ -74,7 +74,7 @@ int rtgui_system_server_init(void)
     rtgui_font_set_defaut(&rtgui_font_asc12);
 #endif
 
-#ifdef RTGUI_USING_TTF
+#ifdef GUIENGINE_USING_TTF
     rtgui_ttf_system_init();
 #endif
 

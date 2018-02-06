@@ -97,7 +97,7 @@ static void rtgui_bitmap_font_draw_text(struct rtgui_font *font, struct rtgui_dc
     rt_uint32_t length;
     struct rtgui_rect text_rect;
     struct rtgui_font_bitmap *bmp_font = (struct rtgui_font_bitmap *)(font->data);
-#ifdef RTGUI_USING_FONTHZ
+#ifdef GUIENGINE_USING_FONTHZ
     struct rtgui_font *hz_font;
 #endif
 
@@ -109,7 +109,7 @@ static void rtgui_bitmap_font_draw_text(struct rtgui_font *font, struct rtgui_dc
     /* parameter check */
     if (text_rect.y1 > text_rect.y2) return;
 
-#ifdef RTGUI_USING_FONTHZ
+#ifdef GUIENGINE_USING_FONTHZ
     hz_font = rtgui_font_refer("hz", font->height);
     while ((text_rect.x1 < text_rect.x2) && len)
     {

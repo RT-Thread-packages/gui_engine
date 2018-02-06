@@ -36,7 +36,7 @@
 #include <dfs_posix.h>
 #endif
 
-#ifdef RTGUI_IMAGE_BMP
+#ifdef GUIENGINE_IMAGE_BMP
 /* Compression encodings for BMP files */
 #ifndef BI_RGB
 #define BI_RGB          0
