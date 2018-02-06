@@ -13,14 +13,21 @@ GUI engine是一套基本的绘图引擎，由C代码编写而成。
 ## 2、获取方式
 
 -  Git方式获取：
-`git clone https://github.com/RT-Thread-packages/gui_engine.git`
+
+    git clone https://github.com/RT-Thread-packages/gui_engine.git
 
 - env工具辅助下载：
-  menuconfig package path：`RT-Thread online package` -> `system package` -> `RT-Thread UI Engine` -> `Enable UI Engine`
+
+menuconfig package path：
+
+    RT-Thread online package
+        system package
+            [*] RT-Thread UI Engine
+                [*] Enable UI Engine`
 
 ## 3、示例介绍
 
 ### 3.1 获取示例
 
-- 配置使能示例选项 `Enable the example of Gui Engine`
-- 配置包版本选为最新版 `latest`
+* 配置使能示例选项 `Enable the example of Gui Engine`
+* 配置包版本选为最新版 `latest`
