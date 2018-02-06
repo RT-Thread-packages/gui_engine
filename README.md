@@ -23,7 +23,7 @@ menuconfig package path：
     RT-Thread online package
         system package
             [*] RT-Thread UI Engine
-                [*] Enable UI Engine`
+                [*] Enable UI Engine
 
 ## 3、示例介绍
 
