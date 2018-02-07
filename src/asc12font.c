@@ -26,7 +26,7 @@
 #include <rtgui/font.h>
 #include <rtgui/font_fnt.h>
 
-#ifdef RTGUI_USING_FONT12
+#ifdef GUIENGINE_USING_FONT12
 
 /* Font information:
    name: DejaVuSans-Bold

@@ -24,7 +24,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/filerw.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 
 /* standard file read/write */
 struct rtgui_filerw_stdio
@@ -215,7 +215,7 @@ const rt_uint8_t *rtgui_filerw_mem_getdata(struct rtgui_filerw *context)
 }
 
 /* file read/write public interface */
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 static int parse_mode(const char *mode)
 {
     int f = 0;

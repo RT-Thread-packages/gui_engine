@@ -428,7 +428,7 @@ struct rtgui_event_command
     rt_int32_t command_id;
 
     /* command string */
-    char command_string[RTGUI_NAME_MAX];
+    char command_string[GUIENGINE_NAME_MAX];
 };
 #define RTGUI_EVENT_COMMAND_INIT(e) RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_COMMAND)
 

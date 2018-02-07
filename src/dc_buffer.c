@@ -94,7 +94,7 @@ struct rtgui_dc *rtgui_dc_buffer_create_pixformat(rt_uint8_t pixel_format, int w
         dc->height = h;
         dc->pitch = w * rtgui_color_get_bpp(pixel_format);
 
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
         dc->image_item = RT_NULL;
 #endif
         dc->pixel = rtgui_malloc(h * dc->pitch);
@@ -112,7 +112,7 @@ struct rtgui_dc *rtgui_dc_buffer_create_pixformat(rt_uint8_t pixel_format, int w
 }
 RTM_EXPORT(rtgui_dc_buffer_create_pixformat);
 
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
 struct rtgui_dc *rtgui_img_dc_create_pixformat(rt_uint8_t pixel_format, 
     rt_uint8_t *pixel, struct rtgui_image_item *image_item)
 {
@@ -198,7 +198,7 @@ static rt_bool_t rtgui_dc_buffer_fini(struct rtgui_dc *dc)
 
     if (dc->type != RTGUI_DC_BUFFER) return RT_FALSE;
 
-#ifdef RTGUI_IMAGE_CONTAINER
+#ifdef GUIENGINE_IMAGE_CONTAINER
     if (buffer->image_item)
     {
         rtgui_image_container_put(buffer->image_item);

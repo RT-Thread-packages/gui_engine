@@ -33,7 +33,7 @@ extern struct rtgui_font rtgui_font_asc16;
 extern struct rtgui_font rtgui_font_arial16;
 extern struct rtgui_font rtgui_font_asc12;
 extern struct rtgui_font rtgui_font_arial12;
-#ifdef RTGUI_USING_FONTHZ
+#ifdef GUIENGINE_USING_FONTHZ
 extern struct rtgui_font rtgui_font_hz16;
 extern struct rtgui_font rtgui_font_hz12;
 #endif
@@ -45,16 +45,16 @@ void rtgui_font_system_init()
     /* set default font to NULL */
     rtgui_default_font = RT_NULL;
 
-#ifdef RTGUI_USING_FONT16
+#ifdef GUIENGINE_USING_FONT16
     rtgui_font_system_add_font(&rtgui_font_asc16);
-#ifdef RTGUI_USING_FONTHZ
+#ifdef GUIENGINE_USING_FONTHZ
     rtgui_font_system_add_font(&rtgui_font_hz16);
 #endif
 #endif
 
-#ifdef RTGUI_USING_FONT12
+#ifdef GUIENGINE_USING_FONT12
     rtgui_font_system_add_font(&rtgui_font_asc12);
-#ifdef RTGUI_USING_FONTHZ
+#ifdef GUIENGINE_USING_FONTHZ
     rtgui_font_system_add_font(&rtgui_font_hz12);
 #endif
 #endif
@@ -101,7 +101,7 @@ struct rtgui_font *rtgui_font_refer(const char *family, rt_uint16_t height)
     rtgui_list_foreach(node, &_rtgui_font_list)
     {
         font = rtgui_list_entry(node, struct rtgui_font, list);
-        if ((rt_strncmp(font->family, family, RTGUI_NAME_MAX) == 0) &&
+        if ((rt_strncmp(font->family, family, GUIENGINE_NAME_MAX) == 0) &&
                 font->height == height)
         {
             font->refer_count ++;
@@ -112,7 +112,7 @@ struct rtgui_font *rtgui_font_refer(const char *family, rt_uint16_t height)
     rtgui_list_foreach(node, &_rtgui_font_list)
     {
         font = rtgui_list_entry(node, struct rtgui_font, list);
-        if (rt_strncmp(font->family, family, RTGUI_NAME_MAX) == 0)
+        if (rt_strncmp(font->family, family, GUIENGINE_NAME_MAX) == 0)
         {
             font->refer_count ++;
             return font;

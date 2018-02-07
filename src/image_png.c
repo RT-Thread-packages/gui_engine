@@ -28,7 +28,7 @@
 #include <rtgui/driver.h>
 #include <rtgui/image.h>
 
-#ifdef RTGUI_IMAGE_PNG
+#ifdef GUIENGINE_IMAGE_PNG
 #include "png.h"
 
 #define PNG_MAGIC_LEN       8
@@ -423,7 +423,7 @@ void rtgui_image_png_init()
     rtgui_image_register_engine(&rtgui_image_png_engine);
 }
 
-#elif defined(RTGUI_IMAGE_LODEPNG)
+#elif defined(GUIENGINE_IMAGE_LODEPNG)
 #include "lodepng.h"
 
 static rt_bool_t rtgui_image_png_check(struct rtgui_filerw *file);

@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #ifdef _WIN32_NATIVE
 #pragma warning(disable: 4996)
 #include <fcntl.h>

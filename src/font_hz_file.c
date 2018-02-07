@@ -29,7 +29,7 @@
 #include <rtgui/tree.h>
 #include <rtgui/rtgui_system.h>
 
-#ifdef RTGUI_USING_HZ_FILE
+#ifdef GUIENGINE_USING_HZ_FILE
 #ifdef _WIN32_NATIVE
 #include <fcntl.h>
 #include <sys/types.h>

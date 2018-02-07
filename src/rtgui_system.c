@@ -32,7 +32,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/window.h>
 
-#ifdef RTGUI_USING_TTF
+#ifdef GUIENGINE_USING_TTF
 #include <rtgui/font_freetype.h>
 #endif
 
@@ -66,15 +66,15 @@ int rtgui_system_server_init(void)
     rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &_mainwin_rect);
 
     /* set the default font */
-#if RTGUI_DEFAULT_FONT_SIZE == 16
+#if GUIENGINE_DEFAULT_FONT_SIZE == 16
     rtgui_font_set_defaut(&rtgui_font_asc16);
-#elif RTGUI_DEFAULT_FONT_SIZE == 12
+#elif GUIENGINE_DEFAULT_FONT_SIZE == 12
     rtgui_font_set_defaut(&rtgui_font_asc12);
 #else
     rtgui_font_set_defaut(&rtgui_font_asc12);
 #endif
 
-#ifdef RTGUI_USING_TTF
+#ifdef GUIENGINE_USING_TTF
     rtgui_ttf_system_init();
 #endif
 

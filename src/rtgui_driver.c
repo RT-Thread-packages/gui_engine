@@ -33,7 +33,7 @@ extern const struct rtgui_graphic_driver_ops *rtgui_framebuffer_get_ops(int pixe
 static struct rtgui_graphic_driver _driver;
 static struct rtgui_graphic_driver *_current_driver = &_driver;
 
-#ifdef RTGUI_USING_VFRAMEBUFFER
+#ifdef GUIENGIN_USING_VFRAMEBUFFER
 #ifndef RTGUI_VFB_PIXEL_FMT
 #define RTGUI_VFB_PIXEL_FMT     RTGRAPHIC_PIXEL_FORMAT_RGB565
 #endif
@@ -222,7 +222,7 @@ rt_err_t rtgui_graphic_set_device(rt_device_t device)
     rtgui_cursor_set_image(RTGUI_CURSOR_ARROW);
 #endif
 
-#ifdef RTGUI_USING_VFRAMEBUFFER
+#ifdef GUIENGIN_USING_VFRAMEBUFFER
     _graphic_driver_vmode_init();
 #endif
 

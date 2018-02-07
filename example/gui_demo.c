@@ -1,6 +1,6 @@
 #include <rtthread.h>
 
-#if defined(RT_USING_GUIENGINE) && defined(RTGUI_USING_DEMO)
+#if defined(PKG_USING_GUIENGINE) && defined(GUIENGINE_USING_DEMO)
 
 #include <rtgui/rtgui.h>
 #include <rtgui/rtgui_system.h>

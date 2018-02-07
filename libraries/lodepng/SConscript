@@ -1,4 +1,4 @@
-# RT-Thread building script for gui
+# RT-Thread building script for Gui Engine
 
 from building import *
 import rtconfig
@@ -8,8 +8,8 @@ src = Glob('*.c') + Glob('*.cpp')
 CPPPATH = [cwd]
 
 if rtconfig.ARCH == 'sim':
-    group = DefineGroup('GuiEngine', src, depend = ['RTGUI_IMAGE_LODEPNG'], CPPPATH = CPPPATH)
+    group = DefineGroup('GuiEngine', src, depend = ['GUIENGINE_IMAGE_LODEPNG'], CPPPATH = CPPPATH)
 else:
-    group = DefineGroup('GuiEngine', src, depend = ['RTGUI_IMAGE_LODEPNG', 'RT_USING_LIBC'], CPPPATH = CPPPATH)
+    group = DefineGroup('GuiEngine', src, depend = ['GUIENGINE_IMAGE_LODEPNG', 'RT_USING_LIBC'], CPPPATH = CPPPATH)
 
 Return('group')

@@ -90,7 +90,7 @@ const rtgui_type_t  *rtgui_type_parent_type_get(const rtgui_type_t *type);
 const char    *rtgui_type_name_get(const rtgui_type_t *type);
 const rtgui_type_t *rtgui_object_object_type_get(rtgui_object_t *object);
 
-#ifdef RTGUI_USING_CAST_CHECK
+#ifdef GUIENGIN_USING_CAST_CHECK
 #define RTGUI_OBJECT_CAST(obj, obj_type, c_type) \
 	 	((c_type *)rtgui_object_check_cast((rtgui_object_t *)(obj), (obj_type), __FUNCTION__, __LINE__))
 #else

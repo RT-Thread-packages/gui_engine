@@ -26,7 +26,7 @@
 #include <rtgui/rtgui.h>
 #include <rtgui/image.h>
 
-#ifdef RTGUI_IMAGE_JPEG
+#ifdef GUIENGINE_IMAGE_JPEG
 #include <stdio.h>
 #include <stdlib.h>
 #include "jpeglib.h"
@@ -35,7 +35,7 @@
 #include <rtgui/filerw.h>
 #include <rtgui/blit.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #include <dfs_posix.h>
 #endif
 
@@ -583,7 +583,7 @@ static rt_bool_t rtgui_image_jpeg_check(struct rtgui_filerw *file)
 
 #endif
 
-#if defined(RTGUI_IMAGE_TJPGD)
+#if defined(GUIENGINE_IMAGE_TJPGD)
 /***************************************************************************//**
  * @file    image_jpg.c
  * @brief   JPEG decoder using TJpgDec module (elm-chan.org)
@@ -612,7 +612,7 @@ static rt_bool_t rtgui_image_jpeg_check(struct rtgui_filerw *file)
 #include <rtgui/filerw.h>
 #include <rtgui/blit.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #include <dfs_posix.h>
 #endif
 
@@ -969,4 +969,4 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image,
         }
     }
 }
-#endif /* defined(RTGUI_IMAGE_TJPGD) */
+#endif /* defined(GUIENGINE_IMAGE_TJPGD) */
