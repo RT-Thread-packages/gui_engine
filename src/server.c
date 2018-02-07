@@ -446,9 +446,9 @@ void rtgui_server_init(void)
 
     tid = rt_thread_create("rtgui",
                            rtgui_server_entry, RT_NULL,
-                           RTGUI_SVR_THREAD_STACK_SIZE,
-                           RTGUI_SVR_THREAD_PRIORITY,
-                           RTGUI_SVR_THREAD_TIMESLICE);
+                           GUIENGIN_SVR_THREAD_STACK_SIZE,
+                           GUIENGINE_SVR_THREAD_PRIORITY,
+                           GUIENGINE_SVR_THREAD_TIMESLICE);
 
     /* start rtgui server thread */
     if (tid != RT_NULL)

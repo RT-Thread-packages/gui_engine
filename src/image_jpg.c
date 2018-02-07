@@ -35,7 +35,7 @@
 #include <rtgui/filerw.h>
 #include <rtgui/blit.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #include <dfs_posix.h>
 #endif
 
@@ -612,7 +612,7 @@ static rt_bool_t rtgui_image_jpeg_check(struct rtgui_filerw *file)
 #include <rtgui/filerw.h>
 #include <rtgui/blit.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #include <dfs_posix.h>
 #endif
 

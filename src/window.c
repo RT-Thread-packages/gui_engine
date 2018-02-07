@@ -756,7 +756,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object *object, struct rtgui_even
         rtgui_win_ondraw(win);
         break;
 
-#ifdef RTGUI_USING_VFRAMEBUFFER
+#ifdef GUIENGIN_USING_VFRAMEBUFFER
     case RTGUI_EVENT_VPAINT_REQ:
     {
         struct rtgui_event_vpaint_req *req = (struct rtgui_event_vpaint_req *)event;
@@ -924,7 +924,7 @@ char *rtgui_win_get_title(rtgui_win_t *win)
 }
 RTM_EXPORT(rtgui_win_get_title);
 
-#ifdef RTGUI_USING_VFRAMEBUFFER
+#ifdef GUIENGIN_USING_VFRAMEBUFFER
 #include <rtgui/driver.h>
 struct rtgui_dc *rtgui_win_get_drawing(rtgui_win_t * win)
 {

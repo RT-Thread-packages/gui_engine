@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #include <dfs_posix.h>
 #endif
 
@@ -845,7 +845,7 @@ void rtgui_image_bmp_header_cfg(struct rtgui_image_bmp_header *bhr, rt_int32_t w
     }
 }
 
-#ifdef RTGUI_USING_DFS_FILERW
+#ifdef GUIENGINE_USING_DFS_FILERW
 #define WRITE_CLUSTER_SIZE  2048
 void bmp_align_write(struct rtgui_filerw *file, char *dest, char *src, rt_int32_t len, rt_int32_t *count)
 {

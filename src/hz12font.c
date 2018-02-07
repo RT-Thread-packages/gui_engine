@@ -24,7 +24,7 @@
 #include <rtgui/font.h>
 
 #if defined(GUIENGINE_USING_FONT12) && defined(GUIENGINE_USING_FONTHZ)
-#ifndef RTGUI_USING_HZ_FILE
+#ifndef GUIENGINE_USING_HZ_FILE
 #ifdef RTGUI_USING_FONT_COMPACT
 extern const unsigned char hz12_font[];
 #else
