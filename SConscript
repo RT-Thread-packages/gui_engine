@@ -5,9 +5,7 @@ from building import *
 
 cwd = GetCurrentDir()
 src = []
-CPPPATH = [ cwd + '/include',
-            cwd + '/include/rtgui',
-            cwd + '/include/rtgui/widgets']
+CPPPATH = [ cwd + '/include']
 
 objs = DefineGroup('GuiEngine', src, depend = ['PKG_USING_GUIENGINE'], CPPPATH = CPPPATH)
 list = os.listdir(cwd)
