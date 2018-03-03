@@ -326,10 +326,10 @@ enum rtgui_gesture_type
     RTGUI_GESTURE_NONE      = 0x0000,
     RTGUI_GESTURE_TAP       = 0x0001,
     /* Usually used to zoom in and out. */
-    RTGUI_GESTURE_PINCH     = 0x0002,
-    RTGUI_GESTURE_DRAG      = 0x0004,
-    RTGUI_GESTURE_LONGPRESS = 0x0008,
-    RTGUI_GESTURE_DRAGGED   = 0x0001 | 0x0004 | 0x0008,
+    RTGUI_GESTURE_LONGPRESS         = 0x0002,
+    RTGUI_GESTURE_DRAG_HORIZONTAL   = 0x0004,
+    RTGUI_GESTURE_DRAG_VERTICAL     = 0x0008,
+    RTGUI_GESTURE_DRAG              = (RTGUI_GESTURE_DRAG_HORIZONTAL | RTGUI_GESTURE_DRAG_VERTICAL),
     /* PINCH, DRAG finished. */
     RTGUI_GESTURE_FINISH    = 0x8000,
     /* The corresponding gesture should be canceled. */
