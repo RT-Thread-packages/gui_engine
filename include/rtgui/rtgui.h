@@ -68,6 +68,15 @@ typedef struct rtgui_point rtgui_point_t;
 extern rtgui_point_t rtgui_empty_point;
 
 /**
+* line segment
+*/
+struct rtgui_line
+{
+    rtgui_point_t start, end;
+};
+typedef struct rtgui_line rtgui_line_t;
+
+/**
  * Rectangle structure
  */
 struct rtgui_rect
