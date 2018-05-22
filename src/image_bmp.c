@@ -94,7 +94,7 @@ static rt_bool_t rtgui_image_bmp_check(struct rtgui_filerw *file)
         {
             break;
         }
-        if (rtgui_filerw_read(file, (void *)buffer, 18, 1) != 18)
+        if (rtgui_filerw_read(file, (void *)buffer, 18, 1) != 1)
         {
             break;
         }
@@ -108,7 +108,7 @@ static rt_bool_t rtgui_image_bmp_check(struct rtgui_filerw *file)
         if (*(rt_uint32_t *)&buffer[14] == 12)
         {
             /* Bitmap Header Version 2.x */
-            if (rtgui_filerw_read(file, (void *)buffer, 8, 1) != 8)
+            if (rtgui_filerw_read(file, (void *)buffer, 8, 1) != 1)
             {
                 break;
             }
@@ -118,7 +118,7 @@ static rt_bool_t rtgui_image_bmp_check(struct rtgui_filerw *file)
         else
         {
             /* Bitmap Header Version bigger than 2.x */
-            if (rtgui_filerw_read(file, (void *)buffer, 8, 1) != 8)
+            if (rtgui_filerw_read(file, (void *)buffer, 8, 1) != 1)
             {
                 break;
             }
@@ -210,7 +210,7 @@ static rt_bool_t rtgui_image_bmp_load(struct rtgui_image *image, struct rtgui_fi
         {
             break;
         }
-        if (rtgui_filerw_read(file, (void *)wrkBuffer, 18, 1) != 18)
+        if (rtgui_filerw_read(file, (void *)wrkBuffer, 18, 1) != 1)
         {
             break;
         }
@@ -227,7 +227,7 @@ static rt_bool_t rtgui_image_bmp_load(struct rtgui_image *image, struct rtgui_fi
         if (bmpHeaderSize == 12)
         {
             /* Bitmap Header Version 2.x */
-            if (rtgui_filerw_read(file, (void *)wrkBuffer, 8, 1) != 8)
+            if (rtgui_filerw_read(file, (void *)wrkBuffer, 8, 1) != 1)
             {
                 break;
             }
@@ -242,7 +242,7 @@ static rt_bool_t rtgui_image_bmp_load(struct rtgui_image *image, struct rtgui_fi
             /* Bitmap Header Version bigger than 2.x */
             rt_uint32_t compression;
 
-            if (rtgui_filerw_read(file, (void *)wrkBuffer, 36, 1) != 36)
+            if (rtgui_filerw_read(file, (void *)wrkBuffer, 36, 1) != 1)
             {
                 break;
             }
