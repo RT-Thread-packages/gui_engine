@@ -168,12 +168,20 @@ rt_err_t rtgui_graphic_set_device(rt_device_t device)
     struct rt_device_graphic_info info;
     struct rtgui_graphic_ext_ops *ext_ops;
 
+    RT_ASSERT(device);
+
+    result = rt_device_open(device, 0);
+    if (result != RT_EOK)
+    {
+        return result;
+    }
+
     /* get framebuffer address */
     result = rt_device_control(device, RTGRAPHIC_CTRL_GET_INFO, &info);
     if (result != RT_EOK)
     {
         /* get device information failed */
-        return -RT_ERROR;
+        return result;
     }
 
     /* if the first set graphic device */
