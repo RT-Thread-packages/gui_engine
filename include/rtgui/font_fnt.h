@@ -28,6 +28,10 @@
 #include <rtgui/font.h>
 #include <rtgui/dc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* fnt font header */
 struct fnt_header
 {
@@ -56,7 +60,11 @@ struct fnt_font
 };
 extern const struct rtgui_font_engine fnt_font_engine;
 
-struct rtgui_font *fnt_font_create(const char* filename);
+struct rtgui_font *fnt_font_create(const char* filename, const char* font_family);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

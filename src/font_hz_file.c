@@ -28,6 +28,7 @@
 #include <rtgui/font.h>
 #include <rtgui/tree.h>
 #include <rtgui/rtgui_system.h>
+#include "rtgui/gb2312.h"
 
 #ifdef GUIENGINE_USING_HZ_FILE
 #ifdef _WIN32_NATIVE
@@ -166,38 +167,45 @@ static void _rtgui_hz_file_font_draw_text(struct rtgui_hz_file_font *hz_file_fon
         rect->y2 - rect->y1 : hz_file_font->font_size;
     word_bytes = (hz_file_font->font_size + 7) / 8;
 
-    str = (rt_uint8_t *)text;
-
-    while (len > 0 && rect->x1 < rect->x2)
+    //str = (rt_uint8_t *)text;
+    str = rt_malloc(UTF_8ToGB2312_LEN(text, len));
+    if (str)
     {
-        const rt_uint8_t *font_ptr;
-        register rt_base_t i, j, k;
+        UTF_8ToGB2312(str, text, len);
 
-        /* get font pixel data */
-        font_ptr = _font_cache_get(hz_file_font, *str | (*(str + 1) << 8));
-
-        /* draw word */
-        for (i = 0; i < h; i ++)
+        while (len > 0 && rect->x1 < rect->x2)
         {
-            for (j = 0; j < word_bytes; j++)
-                for (k = 0; k < 8; k++)
-                {
-                    if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
-                            (rect->x1 + 8 * j + k < rect->x2))
-                    {
-                        rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
-                    }
-                    else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
-                    {
-                        rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
-                    }
-                }
-        }
+            const rt_uint8_t *font_ptr;
+            register rt_base_t i, j, k;
 
-        /* move x to next character */
-        rect->x1 += hz_file_font->font_size;
-        str += 2;
-        len -= 2;
+            /* get font pixel data */
+            font_ptr = _font_cache_get(hz_file_font, *str | (*(str + 1) << 8));
+            if (font_ptr)
+            {
+                /* draw word */
+                for (i = 0; i < h; i++)
+                {
+                    for (j = 0; j < word_bytes; j++)
+                        for (k = 0; k < 8; k++)
+                        {
+                            if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
+                                    (rect->x1 + 8 * j + k < rect->x2))
+                            {
+                                rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
+                            }
+                            else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
+                            {
+                                rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
+                            }
+                        }
+                }
+            }
+
+            /* move x to next character */
+            rect->x1 += hz_file_font->font_size;
+            str += 2;
+            len -= 2;
+        }
     }
 }
 

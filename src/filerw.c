@@ -282,7 +282,7 @@ struct rtgui_filerw *rtgui_filerw_create_file(const char *filename, const char *
     }
     else
     {
-        rt_kprintf("open:%s failed! errno=%d\n", filename, errno);
+        //rt_kprintf("open:%s failed! errno=%d\n", filename, errno);
     }
 
     return RT_NULL;

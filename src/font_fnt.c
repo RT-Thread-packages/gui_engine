@@ -22,9 +22,9 @@
  * 2010-09-15     Bernard      first version
  */
 
- /*
- * rockbox fnt font engine
- */
+/*
+* rockbox fnt font engine
+*/
 #include <rtgui/font_fnt.h>
 #include <rtgui/rtgui_system.h>
 
@@ -135,7 +135,7 @@ void rtgui_fnt_font_get_metrics(struct rtgui_font *font, const char *text, rtgui
     }
 }
 
-#ifdef RTGUI_USING_FNT_FILE
+#ifdef GUIENG_USING_FNT_FILE
 #include <dfs_posix.h>
 
 rt_inline int readbyte(int fd, unsigned char *cp)
