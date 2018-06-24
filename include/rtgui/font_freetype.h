@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 void rtgui_ttf_system_init(void);
-rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size);
+rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size, const char* font_family);
 void rtgui_freetype_font_destroy(rtgui_font_t *font);
 
 #ifdef __cplusplus

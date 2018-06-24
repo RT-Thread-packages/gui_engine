@@ -185,7 +185,7 @@ struct rtgui_image *rtgui_image_create(const char *filename, rt_bool_t load)
     filerw = rtgui_filerw_create_file(filename, "rb");
     if (filerw == RT_NULL)
     {
-        rt_kprintf("create filerw failed!\n");
+        //rt_kprintf("create filerw failed!\n");
         return RT_NULL;
     }
 

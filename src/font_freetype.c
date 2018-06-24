@@ -838,7 +838,7 @@ _err_done_malloc:
 }
 RTM_EXPORT(rtgui_ttf_load);
 
-rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size)
+rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size, const char* font_family)
 {
     struct rtgui_font *font;
     struct rtgui_ttf_font *ttf_font;
@@ -856,7 +856,7 @@ rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size)
     }
     else
     {
-        font = rtgui_font_refer(filename, size);
+        font = rtgui_font_refer(font_family, size);
         if (font)
         {
             if (font->height == size)
@@ -885,7 +885,7 @@ rtgui_font_t *rtgui_freetype_font_create(const char *filename, rt_size_t size)
     ttf_font->image_type_rec.flags 	 = FT_LOAD_RENDER | FT_LOAD_NO_HINTING;
 
     /* set user data */
-    font->family = (char *)(ttf_font->ttf->face_id.pathname);
+    font->family = rt_strdup(font_family);
     font->height = (rt_uint16_t)ttf_font->image_type_rec.height;
     font->refer_count = 1;
     font->engine = &ftc_engine;
@@ -922,6 +922,6 @@ RTM_EXPORT(rtgui_freetype_font_destroy);
 
 #ifdef RT_USING_FINSH
 #include <finsh.h>
-FINSH_FUNCTION_EXPORT_ALIAS(rtgui_freetype_font_create, ffc, "create freetype font: name, size")
+FINSH_FUNCTION_EXPORT_ALIAS(rtgui_freetype_font_create, ffc, "create freetype font: name, size, family")
 #endif
 #endif
