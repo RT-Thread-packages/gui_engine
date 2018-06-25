@@ -580,10 +580,14 @@ static void rtgui_dc_buffer_blit(struct rtgui_dc *self,
                                             rtgui_color_get_bpp(dc->pixel_format));
             if (hw_driver->framebuffer != RT_NULL)
             {
-                struct rtgui_widget* owner;
-                if (dest->type == RTGUI_DC_HW) owner = ((struct rtgui_dc_hw*) dest)->owner;
-                else if (dest->type == RTGUI_DC_CLIENT) owner = RTGUI_CONTAINER_OF(dest, struct rtgui_widget, dc_type);
-                else RT_ASSERT(0);
+                struct rtgui_widget* owner = RT_NULL;
+
+                if (dest->type == RTGUI_DC_HW)
+                    owner = ((struct rtgui_dc_hw*) dest)->owner;
+                else if (dest->type == RTGUI_DC_CLIENT)
+                    owner = RTGUI_CONTAINER_OF(dest, struct rtgui_widget, dc_type);
+                else
+                    RT_ASSERT(0);
 
                 /* change the logic coordinate to the device coordinate */
                 rtgui_rect_move(dest_rect, owner->extent.x1, owner->extent.y1);
