@@ -113,8 +113,8 @@ struct rtgui_dc *rtgui_dc_buffer_create_pixformat(rt_uint8_t pixel_format, int w
 RTM_EXPORT(rtgui_dc_buffer_create_pixformat);
 
 #ifdef GUIENGINE_IMAGE_CONTAINER
-struct rtgui_dc *rtgui_img_dc_create_pixformat(rt_uint8_t pixel_format, 
-    rt_uint8_t *pixel, struct rtgui_image_item *image_item)
+struct rtgui_dc *rtgui_img_dc_create_pixformat(rt_uint8_t pixel_format,
+        rt_uint8_t *pixel, struct rtgui_image_item *image_item)
 {
     struct rtgui_dc_buffer *dc;
 
@@ -507,7 +507,7 @@ static void rtgui_dc_buffer_blit(struct rtgui_dc *self,
 
             rtgui_blit(&info);
         }
-        else if (dest->type == RTGUI_DC_CLIENT&& hw_driver->framebuffer != RT_NULL)
+        else if (dest->type == RTGUI_DC_CLIENT && hw_driver->framebuffer != RT_NULL)
         {
             /* use rtgui_blit */
             rt_uint8_t bpp, hw_bpp;
@@ -546,19 +546,23 @@ static void rtgui_dc_buffer_blit(struct rtgui_dc *self,
             for (index = 0; index < num_rects; index ++)
             {
                 struct rtgui_rect *r = &rects[index];
+                rt_uint16_t blit_width, blit_height;
+
+                blit_width = rtgui_rect_width(*r) >(hw_driver->width - r->x1) ? (hw_driver->width - r->x1) : rtgui_rect_width(*r);
+                blit_height = rtgui_rect_height(*r) > (hw_driver->height - r->y1) ? (hw_driver->height - r->y1) : rtgui_rect_height(*r);
 
                 /* blit source */
                 info.src = _dc_get_pixel(dc, dc_point.x + (r->x1 - dest_extent.x1),
                                          dc_point.y + (r->y1 - dest_extent.y1));
-                info.src_h = rtgui_rect_height(*r);
-                info.src_w = rtgui_rect_width(*r);
+                info.src_h = blit_height;
+                info.src_w = blit_width;
                 info.src_skip = info.src_pitch - info.src_w * bpp;
 
                 /* blit destination */
                 info.dst = (rt_uint8_t*)hw_driver->framebuffer + r->y1 * hw_driver->pitch +
                            r->x1 * hw_bpp;
-                info.dst_h = rtgui_rect_height(*r);
-                info.dst_w = rtgui_rect_width(*r);
+                info.dst_h = blit_height;
+                info.dst_w = blit_width;
                 info.dst_skip = info.dst_pitch - info.dst_w * hw_bpp;
 
                 rtgui_blit(&info);
