@@ -394,17 +394,17 @@ rtgui_image_item_t *rtgui_image_container_get(const char *filename)
         {
             item = (struct rtgui_image_item *) rtgui_malloc(sizeof(struct rtgui_image_item));
             if (item == RT_NULL)
-			{
-				rt_mutex_release(&_image_hash_lock);
-				return RT_NULL;
-			}
+            {
+                rt_mutex_release(&_image_hash_lock);
+                return RT_NULL;
+            }
 
             /* create a image object */
             item->image = rtgui_image_create(filename, RT_TRUE);
             if (item->image == RT_NULL)
             {
                 rtgui_free(item);
-				rt_mutex_release(&_image_hash_lock);
+                rt_mutex_release(&_image_hash_lock);
                 return RT_NULL; /* create image failed */
             }
             item->refcount = 1;
@@ -422,6 +422,57 @@ rtgui_image_item_t *rtgui_image_container_get(const char *filename)
     return item;
 }
 RTM_EXPORT(rtgui_image_container_get);
+
+rtgui_image_item_t *rtgui_image_container_find(const char *filename)
+{
+    struct rtgui_image_item *item = RT_NULL;
+
+    if (rt_mutex_take(&_image_hash_lock, RT_WAITING_FOREVER) == RT_EOK)
+    {
+        item = hash_table_find(image_hash_table, filename);
+        if (item != RT_NULL)
+        {
+            item->refcount++; /* increase refcount */
+        }
+
+        rt_mutex_release(&_image_hash_lock);
+    }
+
+    return item;
+}
+RTM_EXPORT(rtgui_image_container_find);
+
+rtgui_image_item_t *rtgui_image_container_create(const char *filename)
+{
+    struct rtgui_image_item *item = RT_NULL;
+
+    if (rt_mutex_take(&_image_hash_lock, RT_WAITING_FOREVER) == RT_EOK)
+    {
+        item = (struct rtgui_image_item *) rtgui_malloc(sizeof(struct rtgui_image_item));
+        if (item == RT_NULL)
+        {
+            rt_mutex_release(&_image_hash_lock);
+            return RT_NULL;
+        }
+
+        /* create a image object */
+        item->image = rtgui_image_create(filename, RT_TRUE);
+        if (item->image == RT_NULL)
+        {
+            rtgui_free(item);
+            rt_mutex_release(&_image_hash_lock);
+            return RT_NULL; /* create image failed */
+        }
+        item->refcount = 1;
+        item->filename = rt_strdup(filename);
+        hash_table_insert(image_hash_table, item->filename, item);
+
+        rt_mutex_release(&_image_hash_lock);
+    }
+
+    return item;
+}
+RTM_EXPORT(rtgui_image_container_create);
 
 void rtgui_image_container_put(rtgui_image_item_t *item)
 {

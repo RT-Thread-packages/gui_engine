@@ -46,6 +46,8 @@ typedef struct rtgui_image_item rtgui_image_item_t;
 void rtgui_system_image_container_init(void);
 
 struct rtgui_image_item *rtgui_image_container_get(const char *filename);
+struct rtgui_image_item *rtgui_image_container_find(const char *filename);
+struct rtgui_image_item *rtgui_image_container_create(const char *filename);
 void rtgui_image_container_put(struct rtgui_image_item *item);
 
 #endif
