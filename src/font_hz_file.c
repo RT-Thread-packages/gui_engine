@@ -167,51 +167,45 @@ static void _rtgui_hz_file_font_draw_text(struct rtgui_hz_file_font *hz_file_fon
         rect->y2 - rect->y1 : hz_file_font->font_size;
     word_bytes = (hz_file_font->font_size + 7) / 8;
 
-    //str = (rt_uint8_t *)text;
-    str = rt_malloc(UTF_8ToGB2312_LEN(text, len));
-    if (str)
+    str = (rt_uint8_t *)text;
+
+    while (len > 0 && rect->x1 < rect->x2)
     {
-        UTF_8ToGB2312(str, text, len);
+        const rt_uint8_t *font_ptr;
+        register rt_base_t i, j, k;
 
-        while (len > 0 && rect->x1 < rect->x2)
+        /* get font pixel data */
+        font_ptr = _font_cache_get(hz_file_font, *str | (*(str + 1) << 8));
+
+        /* draw word */
+        for (i = 0; i < h; i++)
         {
-            const rt_uint8_t *font_ptr;
-            register rt_base_t i, j, k;
-
-            /* get font pixel data */
-            font_ptr = _font_cache_get(hz_file_font, *str | (*(str + 1) << 8));
-            if (font_ptr)
-            {
-                /* draw word */
-                for (i = 0; i < h; i++)
+            for (j = 0; j < word_bytes; j++)
+                for (k = 0; k < 8; k++)
                 {
-                    for (j = 0; j < word_bytes; j++)
-                        for (k = 0; k < 8; k++)
-                        {
-                            if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
-                                    (rect->x1 + 8 * j + k < rect->x2))
-                            {
-                                rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
-                            }
-                            else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
-                            {
-                                rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
-                            }
-                        }
+                    if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
+                            (rect->x1 + 8 * j + k < rect->x2))
+                    {
+                        rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
+                    }
+                    else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
+                    {
+                        rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
+                    }
                 }
-            }
-
-            /* move x to next character */
-            rect->x1 += hz_file_font->font_size;
-            str += 2;
-            len -= 2;
         }
+
+        /* move x to next character */
+        rect->x1 += hz_file_font->font_size;
+        str += 2;
+        len -= 2;
     }
 }
 
 static void rtgui_hz_file_font_draw_text(struct rtgui_font *font, struct rtgui_dc *dc, const char *text, rt_ubase_t length, struct rtgui_rect *rect)
 {
-    rt_uint32_t len;
+    rt_uint8_t *str, *str_p;
+    rt_uint32_t len, str_len;
     struct rtgui_font *efont;
     struct rtgui_hz_file_font *hz_file_font = (struct rtgui_hz_file_font *)font->data;
     struct rtgui_rect text_rect;
@@ -226,41 +220,69 @@ static void rtgui_hz_file_font_draw_text(struct rtgui_font *font, struct rtgui_d
     efont = rtgui_font_refer("asc", hz_file_font->font_size);
     if (efont == RT_NULL) efont = rtgui_font_default(); /* use system default font */
 
-    while (length > 0)
+    str = rt_malloc(UTF_8ToGB2312_LEN(text, length));
+    if (str)
+    {
+        str_p = str;
+        UTF_8ToGB2312(str, text, length);
+        str_len = strlen((const char *)str);
+    }
+    else
+    {
+        return;
+    }
+
+    while (str_len > 0)
     {
         len = 0;
-        while (((rt_uint8_t) * (text + len)) < 0x80 && *(text + len) && len < length) len ++;
+        while (((rt_uint8_t) * (str + len)) < 0x80 && *(str + len) && len < str_len) len ++;
         /* draw text with English font */
         if (len > 0)
         {
-            rtgui_font_draw(efont, dc, text, len, &text_rect);
+            rtgui_font_draw(efont, dc, str, len, &text_rect);
+			text_rect.x1 += (hz_file_font->font_size / 2 * len);
 
-            text += len;
-            length -= len;
+            str += len;
+            str_len -= len;
         }
 
         len = 0;
-        while (((rt_uint8_t) * (text + len)) >= 0x80 && len < length) len ++;
+        while (((rt_uint8_t) * (str + len)) >= 0x80 && len < str_len) len ++;
         if (len > 0)
         {
-            _rtgui_hz_file_font_draw_text(hz_file_font, dc, text, len, &text_rect);
+            _rtgui_hz_file_font_draw_text(hz_file_font, dc, str, len, &text_rect);
 
-            text += len;
-            length -= len;
+            str += len;
+            str_len -= len;
         }
     }
 
     rtgui_font_derefer(efont);
+
+    rt_free(str_p);
 }
 
 static void rtgui_hz_file_font_get_metrics(struct rtgui_font *font, const char *text, rtgui_rect_t *rect)
 {
+    rt_uint8_t *str;
     struct rtgui_hz_file_font *hz_file_font = (struct rtgui_hz_file_font *)font->data;
     RT_ASSERT(hz_file_font != RT_NULL);
 
+    str = rt_malloc(UTF_8ToGB2312_LEN(text, strlen(text)));
+    if (str)
+    {
+        UTF_8ToGB2312(str, text, strlen(text));
+    }
+    else
+    {
+        return;
+    }
+
     /* set metrics rect */
     rect->x1 = rect->y1 = 0;
-    rect->x2 = (rt_int16_t)(hz_file_font->font_size / 2 * rt_strlen((const char *)text));
+    rect->x2 = (rt_int16_t)(hz_file_font->font_size / 2 * rt_strlen((const char *)str));
     rect->y2 = hz_file_font->font_size;
+
+    rt_free(str);
 }
 #endif
