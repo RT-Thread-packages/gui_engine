@@ -49,7 +49,7 @@ void rtgui_fnt_font_draw_text(struct rtgui_font *font, struct rtgui_dc *dc, cons
     fnt = (struct fnt_font*)font->data;
     RT_ASSERT(fnt != RT_NULL);
 
-    rtgui_font_get_metrics(rtgui_dc_get_gc(dc)->font, text, &text_rect);
+    rtgui_font_get_metrics(font, text, &text_rect);
     rtgui_rect_move_to_align(rect, &text_rect, RTGUI_DC_TEXTALIGN(dc));
 
     while (len)
