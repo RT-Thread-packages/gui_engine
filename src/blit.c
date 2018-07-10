@@ -1150,7 +1150,7 @@ static void BlitAlphatoARGB8888PixelAlpha(struct rtgui_blit_info *info)
                 }
                 else
                 {
-                    dstpixel = ((rt_uint32_t)srcA << 24) | ((rt_uint32_t)srcR << 16) | ((rt_uint32_t)srcG << 8) | srcB;
+                    dstpixel = srcpixel;
                 }
 
                 *dst = dstpixel;
@@ -1218,7 +1218,7 @@ static void BlitARGB8888toARGB8888PixelAlpha(struct rtgui_blit_info *info)
                 }
                 else
                 {
-                    dstpixel = srcpixel;
+                    dstpixel = (srcpixel & 0x00FFFFFF) | ((rt_uint32_t)srcA << 24);
                 }
 
                 *dst = dstpixel;
@@ -1274,9 +1274,9 @@ BlitRGB565toARGB8888(struct rtgui_blit_info * info)
 void rtgui_blit(struct rtgui_blit_info * info)
 {
     if (info->src_h == 0 ||
-        info->src_w == 0 ||
-        info->dst_h == 0 ||
-        info->dst_w == 0)
+            info->src_w == 0 ||
+            info->dst_h == 0 ||
+            info->dst_w == 0)
         return;
 
     /* We only use the dst_w in the low level drivers. So adjust the info right

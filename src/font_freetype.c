@@ -269,7 +269,7 @@ static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to
 
     /* move to insider of rect */
     if (RTGUI_ALIGN_TTF_SIZE & align)
-        rtgui_rect_move_to_point(to, rect->x1, rect->y1 + height * 3 / 4 - to->y2);
+        rtgui_rect_move_to_point(to, rect->x1, rect->y1 + height * 7 / 10 - to->y2);
     else
         rtgui_rect_move_to_point(to, rect->x1, rect->y1);
     PINFO(" rect align =2=>  %d %d %d %d\n", to->x1, to->y1, to->x2, to->y2);
