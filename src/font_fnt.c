@@ -195,7 +195,7 @@ struct rtgui_font *fnt_font_create(const char* filename, const char* font_family
     font->data = (void*)fnt;
 
     fnt_header = &(fnt->header);
-    if (readstr(fd, fnt_header->version, 4) != 4) goto __exit;
+    if (readstr(fd, (char *)fnt_header->version, 4) != 4) goto __exit;
     if (!readshort(fd, &fnt_header->max_width)) goto __exit;
     if (!readshort(fd, &fnt_header->height)) goto __exit;
     if (!readshort(fd, &fnt_header->ascent)) goto __exit;
@@ -211,7 +211,7 @@ struct rtgui_font *fnt_font_create(const char* filename, const char* font_family
     fnt->bits = (MWIMAGEBITS*) rtgui_malloc (fnt_header->nbits * sizeof(MWIMAGEBITS));
     if (fnt->bits == RT_NULL) goto __exit;
     /* read data */
-    if (readstr(fd, &(fnt->bits[0]), fnt_header->nbits) != fnt_header->nbits) goto __exit;
+    if (readstr(fd, (char *)&(fnt->bits[0]), fnt_header->nbits) != fnt_header->nbits) goto __exit;
 
     /* check boundary */
     if (fnt_header->nbits & 0x01)
@@ -228,7 +228,7 @@ struct rtgui_font *fnt_font_create(const char* filename, const char* font_family
 
         for (index = 0; index < fnt_header->noffset; index ++)
         {
-            if (!readshort(fd, &(fnt->offset[index]))) goto __exit;
+            if (!readshort(fd, (unsigned short *)&(fnt->offset[index]))) goto __exit;
         }
     }
 
@@ -239,7 +239,7 @@ struct rtgui_font *fnt_font_create(const char* filename, const char* font_family
 
         for (index = 0; index < fnt_header->nwidth; index ++)
         {
-            if (!readbyte(fd, &(fnt->width[index]))) goto __exit;
+            if (!readbyte(fd, (unsigned char *)&(fnt->width[index]))) goto __exit;
         }
     }
 
@@ -259,9 +259,9 @@ __exit:
     if (fd >= 0) close(fd);
     if (fnt != RT_NULL)
     {
-        if (fnt->bits != RT_NULL) rtgui_free(fnt->bits);
-        if (fnt->offset != RT_NULL) rtgui_free(fnt->offset);
-        if (fnt->width != RT_NULL) rtgui_free(fnt->width);
+        if (fnt->bits != RT_NULL) rtgui_free((void *)fnt->bits);
+        if (fnt->offset != RT_NULL) rtgui_free((void *)fnt->offset);
+        if (fnt->width != RT_NULL) rtgui_free((void *)fnt->width);
 
         rtgui_free(fnt);
     }
