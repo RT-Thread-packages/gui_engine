@@ -38,7 +38,7 @@ extern struct rtgui_font rtgui_font_hz16;
 extern struct rtgui_font rtgui_font_hz12;
 #endif
 
-void rtgui_font_system_init()
+void rtgui_font_system_init(void)
 {
     rtgui_list_init(&(_rtgui_font_list));
 
@@ -48,16 +48,36 @@ void rtgui_font_system_init()
 #ifdef GUIENGINE_USING_FONT16
     rtgui_font_system_add_font(&rtgui_font_asc16);
 #ifdef GUIENGINE_USING_FONTHZ
-    rtgui_font_system_add_font(&rtgui_font_hz16);
+    //rtgui_font_system_add_font(&rtgui_font_hz16);
 #endif
 #endif
 
 #ifdef GUIENGINE_USING_FONT12
     rtgui_font_system_add_font(&rtgui_font_asc12);
 #ifdef GUIENGINE_USING_FONTHZ
-    rtgui_font_system_add_font(&rtgui_font_hz12);
+    //rtgui_font_system_add_font(&rtgui_font_hz12);
 #endif
 #endif
+}
+
+void rtgui_font_fd_uninstall(void)
+{
+    struct rtgui_list_node *node;
+    struct rtgui_font *font;
+
+    rtgui_list_foreach(node, &_rtgui_font_list)
+    {
+        font = rtgui_list_entry(node, struct rtgui_font, list);
+        if (rt_strcmp(font->family, "hz") == 0 || rt_strstr(font->family, ".fnt") != RT_NULL || rt_strstr(font->family, ".FNT") != RT_NULL)
+        {
+            struct rtgui_hz_file_font *hz_file_font = (struct rtgui_hz_file_font *)font->data;
+            if (hz_file_font->fd >= 0)
+            {
+                close(hz_file_font->fd);
+                hz_file_font->fd = -1;
+            }
+        }
+    }
 }
 
 void rtgui_font_system_add_font(struct rtgui_font *font)
@@ -103,16 +123,6 @@ struct rtgui_font *rtgui_font_refer(const char *family, rt_uint16_t height)
         font = rtgui_list_entry(node, struct rtgui_font, list);
         if ((rt_strncmp(font->family, family, GUIENGINE_NAME_MAX) == 0) &&
                 font->height == height)
-        {
-            font->refer_count ++;
-            return font;
-        }
-    }
-
-    rtgui_list_foreach(node, &_rtgui_font_list)
-    {
-        font = rtgui_list_entry(node, struct rtgui_font, list);
-        if (rt_strncmp(font->family, family, GUIENGINE_NAME_MAX) == 0)
         {
             font->refer_count ++;
             return font;

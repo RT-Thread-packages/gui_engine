@@ -113,6 +113,7 @@ struct rtgui_font
 typedef struct rtgui_font rtgui_font_t;
 
 void rtgui_font_system_init(void);
+void rtgui_font_fd_uninstall(void);
 void rtgui_font_system_add_font(struct rtgui_font *font);
 void rtgui_font_system_remove_font(struct rtgui_font *font);
 struct rtgui_font *rtgui_font_default(void);
