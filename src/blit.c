@@ -795,17 +795,32 @@ Blit565to565PixelAlpha(struct rtgui_blit_info * info)
         alpha >>= 3;
     }
 
-    if (alpha == 0)
-        return;
-
+    if (alpha > 0)
     {
         int width = info->dst_w / 2;
         int height = info->dst_h;
         rt_uint32_t *srcp = (rt_uint32_t *) info->src;
         rt_uint32_t *dstp = (rt_uint32_t *) info->dst;
+        rt_bool_t addr_align = ((rt_uint32_t)info->dst % 4) / 2;
 
         while (height--)
         {
+            if (addr_align)
+            {
+                rt_uint32_t s = *(rt_uint16_t*)srcp;
+                rt_uint32_t d = *(rt_uint16_t*)dstp;
+
+                s = (s | s << 16) & 0x07e0f81f;
+                d = (d | d << 16) & 0x07e0f81f;
+                d += (s - d) * alpha / 32;
+                d &= 0x07e0f81f;
+                *(rt_uint16_t*)dstp = (rt_uint16_t)(d | d >> 16);
+                srcp = (rt_uint32_t*)((unsigned int)srcp + 2);
+                dstp = (rt_uint32_t*)((unsigned int)dstp + 2);
+                
+                width = (info->dst_w - 1) / 2;
+            }
+            
             DUFFS_LOOP8(
             {
                 rt_uint32_t s = *srcp++;
@@ -822,8 +837,9 @@ Blit565to565PixelAlpha(struct rtgui_blit_info * info)
                 d = ((s - d) * alpha / 32 + d) & 0x07e0f81f;
                 *dstp++ = (du << 16) | (du >> 16) | d;
             }, width);
+            
             /* Deal with the last pixel. */
-            if (info->dst_w % 2)
+            if ((addr_align && (info->dst_w - 1) % 2) || (!addr_align && info->dst_w % 2))
             {
                 rt_uint32_t s = *(rt_uint16_t*)srcp;
                 rt_uint32_t d = *(rt_uint16_t*)dstp;
@@ -836,6 +852,7 @@ Blit565to565PixelAlpha(struct rtgui_blit_info * info)
                 srcp = (rt_uint32_t*)((unsigned int)srcp + 2);
                 dstp = (rt_uint32_t*)((unsigned int)dstp + 2);
             }
+            
             srcp = (rt_uint32_t*)((unsigned int)srcp + info->src_skip);
             dstp = (rt_uint32_t*)((unsigned int)dstp + info->dst_skip);
         }
