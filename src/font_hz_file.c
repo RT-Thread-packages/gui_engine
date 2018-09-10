@@ -186,23 +186,25 @@ static void _rtgui_hz_file_font_draw_text(struct rtgui_hz_file_font *hz_file_fon
 
         /* get font pixel data */
         font_ptr = _font_cache_get(hz_file_font, *str | (*(str + 1) << 8));
-
-        /* draw word */
-        for (i = 0; i < h; i++)
+        if (font_ptr)
         {
-            for (j = 0; j < word_bytes; j++)
-                for (k = 0; k < 8; k++)
-                {
-                    if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
-                            (rect->x1 + 8 * j + k < rect->x2))
+            /* draw word */
+            for (i = 0; i < h; i++)
+            {
+                for (j = 0; j < word_bytes; j++)
+                    for (k = 0; k < 8; k++)
                     {
-                        rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
+                        if (((font_ptr[i * word_bytes + j] >> (7 - k)) & 0x01) != 0 &&
+                                (rect->x1 + 8 * j + k < rect->x2))
+                        {
+                            rtgui_dc_draw_point(dc, rect->x1 + 8 * j + k, rect->y1 + i);
+                        }
+                        else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
+                        {
+                            rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
+                        }
                     }
-                    else if (style & RTGUI_TEXTSTYLE_DRAW_BACKGROUND)
-                    {
-                        rtgui_dc_draw_color_point(dc, rect->x1 + 8 * j + k, rect->y1 + i, bc);
-                    }
-                }
+            }
         }
 
         /* move x to next character */
