@@ -177,7 +177,7 @@ struct rtgui_font *rtgui_fnt_font_create(const char* filename, const char* font_
 
         crc = (crc_h << 8) + crc_l;
 
-        if (crc != fnt_header->crc16)
+        if (crc != fnt_header->crc16 || fnt_header->w == 0 || fnt_header->h == 0)
         {
             rtgui_free(fnt_header);
             close(fd);
