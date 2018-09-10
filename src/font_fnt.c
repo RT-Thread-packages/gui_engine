@@ -28,6 +28,20 @@
 #include <rtgui/font_fnt.h>
 #include <rtgui/rtgui_system.h>
 
+#ifdef _WIN32_NATIVE
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <io.h>
+#define open    _open
+#define close   _close
+#define read    _read
+#define write   _write
+#define unlink  _unlink
+#else
+#include <dfs_posix.h>
+#endif
+
 static void rtgui_fnt_font_draw_text(struct rtgui_font *font, struct rtgui_dc *dc, const char *text, rt_ubase_t len, struct rtgui_rect *rect);
 static void rtgui_fnt_font_get_metrics(struct rtgui_font *font, const char *text, rtgui_rect_t *rect);
 const struct rtgui_font_engine fnt_font_engine =
@@ -206,9 +220,9 @@ struct rtgui_font *rtgui_fnt_font_create(const char* filename, const char* font_
                 asc->last_char = 0xFF;
 
                 lseek(fd, fnt_header->asc_offset, SEEK_SET);
-                if (read(fd, asc->bmp, fnt_header->asc_length) != fnt_header->asc_length)
+                if (read(fd, (void*)asc->bmp, fnt_header->asc_length) != fnt_header->asc_length)
                 {
-                    rtgui_free(asc->bmp);
+                    rtgui_free((void*)asc->bmp);
                     rtgui_free(asc);
                     rtgui_free(asc_font);
                 }
@@ -351,9 +365,9 @@ struct rtgui_font *rtgui_asc_fnt_font_create(const char* filename, const char* f
                 asc->first_char = 0x00;
                 asc->last_char = 0xFF;
 
-                if (read(fd, asc->bmp, file_len) != file_len)
+                if (read(fd, (void*)asc->bmp, file_len) != file_len)
                 {
-                    rtgui_free(asc->bmp);
+                    rtgui_free((void*)asc->bmp);
                     rtgui_free(asc);
                     rtgui_free(asc_font);
                 }
