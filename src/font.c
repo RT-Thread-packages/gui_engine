@@ -76,13 +76,14 @@ void rtgui_font_system_init(void)
 
 void rtgui_font_fd_uninstall(void)
 {
+#ifdef GUIENGINE_USING_HZ_FILE
     struct rtgui_list_node *node;
     struct rtgui_font *font;
 
     rtgui_list_foreach(node, &_rtgui_font_list)
     {
         font = rtgui_list_entry(node, struct rtgui_font, list);
-        if (rt_strcmp(font->family, "hz") == 0 || rt_strstr(font->family, ".fnt") != RT_NULL || rt_strstr(font->family, ".FNT") != RT_NULL)
+        if (font->engine == &rtgui_hz_file_font_engine)
         {
             struct rtgui_hz_file_font *hz_file_font = (struct rtgui_hz_file_font *)font->data;
             if (hz_file_font->fd >= 0)
@@ -92,6 +93,7 @@ void rtgui_font_fd_uninstall(void)
             }
         }
     }
+#endif
 }
 
 void rtgui_font_system_add_font(struct rtgui_font *font)
