@@ -277,6 +277,7 @@ static void rtgui_hz_file_font_draw_text(struct rtgui_font *font, struct rtgui_d
 static void rtgui_hz_file_font_get_metrics(struct rtgui_font *font, const char *text, rtgui_rect_t *rect)
 {
     rt_uint8_t *str;
+    rt_uint32_t x2;
     struct rtgui_hz_file_font *hz_file_font = (struct rtgui_hz_file_font *)font->data;
     RT_ASSERT(hz_file_font != RT_NULL);
 
@@ -292,7 +293,8 @@ static void rtgui_hz_file_font_get_metrics(struct rtgui_font *font, const char *
 
     /* set metrics rect */
     rect->x1 = rect->y1 = 0;
-    rect->x2 = (rt_int16_t)(hz_file_font->font_size / 2 * rt_strlen((const char *)str));
+    x2 = hz_file_font->font_size / 2 * rt_strlen((const char *)str);
+    rect->x2 = (rt_int16_t)(x2 >= 0x7FFF ? 0x7FFF : x2);
     rect->y2 = hz_file_font->font_size;
 
     rt_free(str);
