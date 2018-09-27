@@ -62,6 +62,9 @@ rt_bool_t rtgui_container_dispatch_event(rtgui_container_t *container, rtgui_eve
     rtgui_event_t save_event = *event;
     rtgui_widget_t *widget = (rtgui_widget_t *)container;
 
+    if (RTGUI_WIDGET_IS_HIDE(widget))
+        return RT_TRUE;
+
     rtgui_list_foreach(node, &(container->children))
     {
         struct rtgui_widget *w;
