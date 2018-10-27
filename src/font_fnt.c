@@ -182,8 +182,9 @@ struct rtgui_font *rtgui_fnt_font_create(const char* filename, const char* font_
         rt_uint16_t crc_h = data[0];
         rt_uint16_t crc_l = data[1];
         rt_uint16_t crc;
+        rt_uint8_t i ;
 
-        for (int i = 2; i < 22; i += 2)
+        for (i = 2; i < 22; i += 2)
         {
             crc_h ^= data[i];
             crc_l ^= data[i + 1];
