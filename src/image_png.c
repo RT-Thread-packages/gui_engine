@@ -494,7 +494,7 @@ static rt_bool_t rtgui_image_png_load(struct rtgui_image *image, struct rtgui_fi
     error = lodepng_decode32(&pixel, &width, &height, in, in_size);
     if(error)
     {
-        rt_kprintf("error %u: %s\n", error, lodepng_error_text(error));
+        rt_kprintf("lodepng decode32 error %u: %s\n", error, lodepng_error_text(error));
         rtgui_free(in);
         return RT_FALSE;
     }
