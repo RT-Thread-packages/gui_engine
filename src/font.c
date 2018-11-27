@@ -25,6 +25,7 @@
  */
 #include <rtgui/font.h>
 #include <rtgui/dc.h>
+#include <rtgui/filerw.h>
 
 static rtgui_list_t _rtgui_font_list;
 static struct rtgui_font *rtgui_default_font;

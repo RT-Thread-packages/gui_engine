@@ -61,7 +61,7 @@ struct rtgui_timer
 };
 typedef struct rtgui_timer rtgui_timer_t;
 
-rtgui_timer_t *rtgui_timer_create(rt_int32_t time, rt_base_t flag, rtgui_timeout_func timeout, void *parameter);
+rtgui_timer_t *rtgui_timer_create(rt_int32_t time, rt_int32_t flag, rtgui_timeout_func timeout, void *parameter);
 void rtgui_timer_destory(rtgui_timer_t *timer);
 
 void rtgui_timer_set_timeout(rtgui_timer_t *timer, rt_int32_t time);
