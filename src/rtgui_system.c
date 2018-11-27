@@ -702,7 +702,7 @@ rt_err_t rtgui_send_sync(struct rtgui_app* app, rtgui_event_t *event, rt_size_t 
         goto __return;
     }
 
-    r = rt_mb_recv(&ack_mb, (rt_uint32_t *)&ack_status, RT_WAITING_FOREVER);
+    r = rt_mb_recv(&ack_mb, (rt_ubase_t *)&ack_status, RT_WAITING_FOREVER);
     if (r != RT_EOK)
         goto __return;
 

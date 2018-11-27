@@ -84,7 +84,9 @@ typedef struct tColorY
 /*!
 \brief Returns maximum of two numbers a and b.
 */
+#ifndef MAX
 #define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+#endif
 
 /*!
 \brief Number of guard rows added to destination surfaces.

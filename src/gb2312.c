@@ -2237,14 +2237,10 @@ void UTF_8ToUnicode(unsigned short* pOut, char *pText)
 
 void UnicodeToGB2312(char* pOut, unsigned short uData)
 {
-    int ret;
-
-    ret = unicode_to_gb2312(uData, (unsigned char *)pOut, (unsigned char *)(pOut+1));
+    unicode_to_gb2312(uData, (unsigned char *)pOut, (unsigned char *)(pOut+1));
 
     pOut[0] += 0xa0 + 1;
     pOut[1] += 0xa0 + 1;
-
-    return;
 }
 
 void Gb2312ToUnicode(unsigned short* pOut, char *pGb2312Word)
@@ -2301,8 +2297,8 @@ void GB2312ToUTF_8(char *pOut,char *pText, int pLen)
     char* rst = pOut;
     int i = 0, j = 0;
 
-    memset(buf, 0, 4);
-    memset(rst, 0, pLen + (pLen >> 2) + 2);
+    rt_memset(buf, 0, 4);
+    rt_memset(rst, 0, pLen + (pLen >> 2) + 2);
 
     while(i < pLen)
     {
@@ -2313,15 +2309,15 @@ void GB2312ToUTF_8(char *pOut,char *pText, int pLen)
         else
         {
             unsigned short pbuffer;
-            unsigned short int tmp = 0;
+//            unsigned short int tmp = 0;
 
             Gb2312ToUnicode(&pbuffer,pText+i);
 
             UnicodeToUTF_8(buf,&pbuffer);
 
-            tmp = rst[j] = buf[0];
-            tmp = rst[j+1] = buf[1];
-            tmp = rst[j+2] = buf[2];
+//            tmp = rst[j] = buf[0];
+//            tmp = rst[j+1] = buf[1];
+//            tmp = rst[j+2] = buf[2];
 
             j += 3;
             i += 2;
@@ -2360,7 +2356,7 @@ void UTF_8ToGB2312(char *pOut, char *pText, int pLen)
     char Ctemp[4];
     int i = 0, j = 0;
 
-    memset(Ctemp, 0, 4);
+    rt_memset(Ctemp, 0, 4);
 
     while(i < pLen)
     {

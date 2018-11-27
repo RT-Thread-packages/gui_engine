@@ -330,8 +330,9 @@ struct rtgui_font *rtgui_hz_fnt_font_create(const char* filename, const char* fo
     }
 
     return font;
-#endif
+#else
     return RT_NULL;
+#endif
 }
 
 struct rtgui_font *rtgui_asc_fnt_font_create(const char* filename, const char* font_family, rt_uint8_t font_size)
