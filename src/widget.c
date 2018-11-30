@@ -538,7 +538,7 @@ void rtgui_widget_update_clip(rtgui_widget_t *widget)
     rtgui_widget_t *parent;
 
     /* no widget or widget is hide, no update clip */
-    if (widget == RT_NULL || RTGUI_WIDGET_IS_HIDE(widget) || widget->parent == RT_NULL)
+    if (widget == RT_NULL || RTGUI_WIDGET_IS_HIDE(widget) || widget->parent == RT_NULL || rtgui_widget_is_in_animation(widget))
         return;
 
     parent = widget->parent;

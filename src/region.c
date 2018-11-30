@@ -616,7 +616,7 @@ rtgui_op(
             {
                 top = RTGUI_MAX(r1y1, ybot);
                 bot = RTGUI_MIN(r1->y2, r2y1);
-                if (top != bot)
+                if (top < bot)
                 {
                     curBand = newReg->data->numRects;
                     rtgui_region_appendNonO(newReg, r1, r1BandEnd, top, bot);
@@ -631,7 +631,7 @@ rtgui_op(
             {
                 top = RTGUI_MAX(r2y1, ybot);
                 bot = RTGUI_MIN(r2->y2, r1y1);
-                if (top != bot)
+                if (top < bot)
                 {
                     curBand = newReg->data->numRects;
                     rtgui_region_appendNonO(newReg, r2, r2BandEnd, top, bot);
