@@ -102,7 +102,6 @@ static void rtgui_time_out(void *parameter)
     event.parent.sender = RT_NULL;
 
     event.timer = timer;
-    timer->pending_cnt++;
 
     result = rtgui_send(timer->app, &(event.parent), sizeof(rtgui_event_timer_t));
     if (result == RT_EOK)
