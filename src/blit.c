@@ -891,35 +891,36 @@ static void BlitRGBtoRGBSurfaceAlpha(struct rtgui_blit_info *info)
     {
         BlitRGBtoRGBSurfaceAlpha128(info);
     }
-    else
+    else if (alpha)
     {
         int width = info->dst_w;
         int height = info->dst_h;
-        rt_uint32_t *srcp = (rt_uint32_t *)info->src;
-        int srcskip = info->src_skip >> 2;
-        rt_uint32_t *dstp = (rt_uint32_t *)info->dst;
-        int dstskip = info->dst_skip >> 2;
+        rt_uint8_t *srcp = (rt_uint8_t *)info->src;
+        int srcskip = info->src_skip;
+        rt_uint8_t *dstp = (rt_uint8_t *)info->dst;
+        int dstskip = info->dst_skip;
+        int inverse_alpha = 257 - alpha;
 
         while(height--)
         {
             DUFFS_LOOP4(
             {
-                rt_uint32_t s;
-                rt_uint32_t d;
-                rt_uint32_t s1;
-                rt_uint32_t d1;
-                s = *srcp;
-                d = *dstp;
-                s1 = s & 0xff00ff;
-                d1 = d & 0xff00ff;
-                d1 = (d1 + ((s1 - d1) * alpha >> 8))
-                & 0xff00ff;
-                s &= 0xff00;
-                d &= 0xff00;
-                d = (d + ((s - d) * alpha >> 8)) & 0xff00;
-                *dstp = d1 | d | 0xff000000;
-                ++srcp;
-                ++dstp;
+                if (alpha == 255)
+                {
+                    *dstp++ = *(srcp + 2);
+                    *dstp++ = *(srcp + 1);
+                    *dstp++ = *(srcp);
+                    *dstp++ = alpha;
+                    srcp += 3;
+                }
+                else if (alpha)
+                {
+                    *dstp++ = ((*(srcp + 2) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    *dstp++ = ((*(srcp + 1) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    *dstp++ = ((*(srcp) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    *dstp++ = alpha + ((255 - alpha) * (*dstp)) / 255;
+                    srcp += 3;
+                }
             }, width);
             srcp += srcskip;
             dstp += dstskip;
