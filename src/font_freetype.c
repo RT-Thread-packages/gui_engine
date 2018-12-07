@@ -252,9 +252,7 @@ static int utf8_to_unicode(rt_uint16_t* unicode, const char* utf8, int len)
 
 static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to, rt_uint16_t height, int align)
 {
-    int dw, dh;
-    dw = 0;
-    dh = 0;
+    int dw = 0, dh = 0;
 
     /* get delta width and height */
     dw = rtgui_rect_width(*rect) - rtgui_rect_width(*to);
@@ -262,8 +260,6 @@ static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to
         dh = rtgui_rect_height(*rect) - height;
     else
         dh = rtgui_rect_height(*rect) - rtgui_rect_height(*to);
-    if (dw < 0) dw = 0;
-    if (dh < 0) dh = 0;
 
     PINFO(" rect align =1=>  %d %d %d %d\n", to->x1, to->y1, to->x2, to->y2);
 
@@ -272,6 +268,7 @@ static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to
         rtgui_rect_move_to_point(to, rect->x1, rect->y1 + height * 7 / 10 - to->y2);
     else
         rtgui_rect_move_to_point(to, rect->x1, rect->y1);
+
     PINFO(" rect align =2=>  %d %d %d %d\n", to->x1, to->y1, to->x2, to->y2);
 
     /* align to right */
