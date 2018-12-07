@@ -915,10 +915,14 @@ static void BlitRGBtoRGBSurfaceAlpha(struct rtgui_blit_info *info)
                 }
                 else if (alpha)
                 {
-                    *dstp++ = ((*(srcp + 2) * alpha) + (inverse_alpha * (*dstp))) >> 8;
-                    *dstp++ = ((*(srcp + 1) * alpha) + (inverse_alpha * (*dstp))) >> 8;
-                    *dstp++ = ((*(srcp) * alpha) + (inverse_alpha * (*dstp))) >> 8;
-                    *dstp++ = alpha + ((255 - alpha) * (*dstp)) / 255;
+                    *dstp = ((*(srcp + 2) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    dstp++;
+                    *dstp = ((*(srcp + 1) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    dstp++;
+                    *dstp = ((*(srcp) * alpha) + (inverse_alpha * (*dstp))) >> 8;
+                    dstp++;
+                    *dstp = alpha + ((255 - alpha) * (*dstp)) / 255;
+                    dstp++;
                     srcp += 3;
                 }
             }, width);
