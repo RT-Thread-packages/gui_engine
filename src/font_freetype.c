@@ -534,6 +534,7 @@ static void _draw_text(struct rtgui_dc *dc,
     int glyphIndex;
     FTC_SBit ftcSBit = RT_NULL;
     FT_Error err = 0;
+    rt_bool_t first = RT_TRUE;
 
     while (*text_short)
     {
@@ -542,11 +543,19 @@ static void _draw_text(struct rtgui_dc *dc,
         err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
         if (err == 0 && ftcSBit->width != 0)
         {
-            begin_x += ((ftcSBit->xadvance - ftcSBit->width) > 0 ? (ftcSBit->xadvance - ftcSBit->width + 1) : (ftcSBit->xadvance - ftcSBit->width - 1)) / 2;
+            if (first == RT_TRUE && ftcSBit->left < 0)
+            {
+                begin_x += 0;
+                first = RT_FALSE;
+            }
+            else
+            {
+                begin_x += ftcSBit->left;
+            }
 
             _draw_bitmap(dc, ftcSBit, begin_x, btm_y, fgc, right, bottom);
 
-            begin_x += ftcSBit->width + (ftcSBit->xadvance - ftcSBit->width) / 2;
+            begin_x += ftcSBit->xadvance - ftcSBit->left;
         }
         else
         {
@@ -656,9 +665,16 @@ static void _get_metrics(struct rtgui_ttf_font *ttf_font, const rt_uint16_t *tex
         if (err == 0 && ftcSBit->width != 0)
         {
             PINFO(" bitmap : <left, top, width, height, xadvance, yadvance> %c (%d, %d, %d, %d, %d, %d)\n",
-                    *text_short, ftcSBit->left, ftcSBit->top, ftcSBit->width, ftcSBit->height, ftcSBit->xadvance, ftcSBit->yadvance);
+                  *text_short, ftcSBit->left, ftcSBit->top, ftcSBit->width, ftcSBit->height, ftcSBit->xadvance, ftcSBit->yadvance);
 
-            w += ftcSBit->xadvance;
+            if (w == 0 && ftcSBit->left < 0)
+            {
+                w += ftcSBit->xadvance - ftcSBit->left;
+            }
+            else
+            {
+                w += ftcSBit->xadvance;
+            }
 
             top = top > ftcSBit->top ? top : ftcSBit->top;
             btm = (ftcSBit->top - ftcSBit->height) > btm ? btm : (ftcSBit->top - ftcSBit->height);
