@@ -2127,22 +2127,20 @@ RTM_EXPORT(rtgui_rect_move_to_point);
 
 void rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to, int align)
 {
-    int dw, dh;
-    dw = 0;
-    dh = 0;
+    int dw = 0, dh = 0;
 
     /* get delta width and height */
     dw = rtgui_rect_width(*rect) - rtgui_rect_width(*to);
     dh = rtgui_rect_height(*rect) - rtgui_rect_height(*to);
-    if (dw < 0) dw = 0;
-    if (dh < 0) dh = 0;
+    //if (dw < 0) dw = 0;
+    //if (dh < 0) dh = 0;
 
     /* move to insider of rect */
     rtgui_rect_move_to_point(to, rect->x1, rect->y1);
 
     /* limited the destination rect to source rect */
-    if (dw == 0) to->x2 = rect->x2;
-    if (dh == 0) to->y2 = rect->y2;
+    //if (dw == 0) to->x2 = rect->x2;
+    //if (dh == 0) to->y2 = rect->y2;
 
     /* align to right */
     if (align & RTGUI_ALIGN_RIGHT)

@@ -252,9 +252,7 @@ static int utf8_to_unicode(rt_uint16_t* unicode, const char* utf8, int len)
 
 static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to, rt_uint16_t height, int align)
 {
-    int dw, dh;
-    dw = 0;
-    dh = 0;
+    int dw = 0, dh = 0;
 
     /* get delta width and height */
     dw = rtgui_rect_width(*rect) - rtgui_rect_width(*to);
@@ -262,8 +260,6 @@ static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to
         dh = rtgui_rect_height(*rect) - height;
     else
         dh = rtgui_rect_height(*rect) - rtgui_rect_height(*to);
-    if (dw < 0) dw = 0;
-    if (dh < 0) dh = 0;
 
     PINFO(" rect align =1=>  %d %d %d %d\n", to->x1, to->y1, to->x2, to->y2);
 
@@ -272,6 +268,7 @@ static void _rtgui_rect_move_to_align(const rtgui_rect_t *rect, rtgui_rect_t *to
         rtgui_rect_move_to_point(to, rect->x1, rect->y1 + height * 7 / 10 - to->y2);
     else
         rtgui_rect_move_to_point(to, rect->x1, rect->y1);
+
     PINFO(" rect align =2=>  %d %d %d %d\n", to->x1, to->y1, to->x2, to->y2);
 
     /* align to right */
@@ -405,7 +402,7 @@ static void _draw_bitmap(struct rtgui_dc *dc,
     struct rtgui_dc_buffer *dest_buf;
 
 
-    x_start = ox + bitmap->left;
+    x_start = ox;
     y_start = btm_y - bitmap->top;
 
     PINFO(" draw bitmap (x, y) -> (%d, %d)\n", x_start, y_start);
@@ -545,27 +542,18 @@ static void _draw_text(struct rtgui_dc *dc,
         err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
         if (err == 0 && ftcSBit->width != 0)
         {
-            /* render font */
-            begin_x -= (ftcSBit->left - (abs(ftcSBit->left) + 2) / 2);
+            begin_x += ((ftcSBit->xadvance - ftcSBit->width) > 0 ? (ftcSBit->xadvance - ftcSBit->width + 1) : (ftcSBit->xadvance - ftcSBit->width - 1)) / 2;
 
             _draw_bitmap(dc, ftcSBit, begin_x, btm_y, fgc, right, bottom);
 
-            begin_x += ftcSBit->width + ftcSBit->left;
-
-            text_short++;
+            begin_x += ftcSBit->width + (ftcSBit->xadvance - ftcSBit->width) / 2;
         }
-        else if (*text_short == ' ')
+        else
         {
-            glyphIndex = FTC_CMapCache_Lookup(ttf_font->ttf->cmap_cache, &ttf_font->ttf->face_id, 0, '-');
-
-            err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
-            if (err == 0)
-            {
-                begin_x += ftcSBit->width;
-
-                text_short++;
-            }
+            begin_x += ttf_font->image_type_rec.height / 2;
         }
+
+        text_short++;
     }
 }
 
@@ -667,28 +655,21 @@ static void _get_metrics(struct rtgui_ttf_font *ttf_font, const rt_uint16_t *tex
         err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
         if (err == 0 && ftcSBit->width != 0)
         {
-            w -= (ftcSBit->left - (abs(ftcSBit->left) + 2) / 2);
-            w += ftcSBit->width + ftcSBit->left;
+            PINFO(" bitmap : <left, top, width, height, xadvance, yadvance> %c (%d, %d, %d, %d, %d, %d)\n",
+                    *text_short, ftcSBit->left, ftcSBit->top, ftcSBit->width, ftcSBit->height, ftcSBit->xadvance, ftcSBit->yadvance);
+
+            w += ftcSBit->xadvance;
 
             top = top > ftcSBit->top ? top : ftcSBit->top;
             btm = (ftcSBit->top - ftcSBit->height) > btm ? btm : (ftcSBit->top - ftcSBit->height);
         }
-        else if (*text_short == ' ')
+        else
         {
-            glyphIndex = FTC_CMapCache_Lookup(ttf_font->ttf->cmap_cache, &ttf_font->ttf->face_id, 0, '-');
-
-            err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
-            if (err == 0)
-            {
-                w += ftcSBit->width;
-            }
+            w += ttf_font->image_type_rec.height / 2;
         }
-        PINFO(" bitmap:(%d, %d, %d, %d)\n", ftcSBit->left, ftcSBit->top - ftcSBit->height, ftcSBit->width, ftcSBit->height);
 
         text_short ++;
     }
-
-    w += ftcSBit->left - (ftcSBit->left - (abs(ftcSBit->left) + 2) / 2);
 
     rect->x1 = 0;
     rect->y1 = btm;
