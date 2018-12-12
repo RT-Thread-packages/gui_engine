@@ -27,6 +27,10 @@
 #include <rtgui/dc.h>
 #include <rtgui/filerw.h>
 
+#ifdef GUIENGINE_USING_TTF
+#include <rtgui/font_freetype.h>
+#endif
+
 static rtgui_list_t _rtgui_font_list;
 static struct rtgui_font *rtgui_default_font;
 
@@ -46,22 +50,9 @@ void rtgui_font_system_init(void)
     /* set default font to NULL */
     rtgui_default_font = RT_NULL;
 
-#ifdef GUIENGINE_USING_FONT16
-    rtgui_font_system_add_font(&rtgui_font_asc16);
-#ifdef GUIENGINE_USING_FONTHZ
-    rtgui_font_system_add_font(&rtgui_font_hz16);
-    {
-        struct rtgui_hz_file_font *hz16 = (struct rtgui_hz_file_font *)rtgui_font_hz16.data;
-        if (hz16->fd < 0)
-        {
-            rtgui_font_system_remove_font(&rtgui_font_hz16);
-        }
-    }
-#endif
-#endif
-
 #ifdef GUIENGINE_USING_FONT12
     rtgui_font_system_add_font(&rtgui_font_asc12);
+    rtgui_default_font = &rtgui_font_asc12;
 #ifdef GUIENGINE_USING_FONTHZ
     rtgui_font_system_add_font(&rtgui_font_hz12);
     {
@@ -70,8 +61,35 @@ void rtgui_font_system_init(void)
         {
             rtgui_font_system_remove_font(&rtgui_font_hz12);
         }
+        else
+        {
+            rtgui_default_font = &rtgui_font_hz12;
+        }
     }
 #endif
+#endif
+
+#ifdef GUIENGINE_USING_FONT16
+    rtgui_font_system_add_font(&rtgui_font_asc16);
+    rtgui_default_font = &rtgui_font_asc16;
+#ifdef GUIENGINE_USING_FONTHZ
+    rtgui_font_system_add_font(&rtgui_font_hz16);
+    {
+        struct rtgui_hz_file_font *hz16 = (struct rtgui_hz_file_font *)rtgui_font_hz16.data;
+        if (hz16->fd < 0)
+        {
+            rtgui_font_system_remove_font(&rtgui_font_hz16);
+        }
+        else
+        {
+            rtgui_default_font = &rtgui_font_hz16;
+        }
+    }
+#endif
+#endif
+
+#ifdef GUIENGINE_USING_TTF
+    rtgui_ttf_system_init();
 #endif
 }
 

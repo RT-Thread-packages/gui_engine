@@ -32,9 +32,6 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/window.h>
 
-#ifdef GUIENGINE_USING_TTF
-#include <rtgui/font_freetype.h>
-#endif
 
 #ifdef _WIN32_NATIVE
 #define RTGUI_MEM_TRACE
@@ -64,19 +61,6 @@ int rtgui_system_server_init(void)
 
     /* use driver rect for main window */
     rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &_mainwin_rect);
-
-    /* set the default font */
-#if GUIENGINE_DEFAULT_FONT_SIZE == 16
-    rtgui_font_set_defaut(&rtgui_font_asc16);
-#elif GUIENGINE_DEFAULT_FONT_SIZE == 12
-    rtgui_font_set_defaut(&rtgui_font_asc12);
-#else
-    rtgui_font_set_defaut(&rtgui_font_asc12);
-#endif
-
-#ifdef GUIENGINE_USING_TTF
-    rtgui_ttf_system_init();
-#endif
 
     return 0;
 }
