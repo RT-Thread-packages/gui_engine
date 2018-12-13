@@ -43,7 +43,7 @@ const static rt_uint8_t pixel_bits_table[] =
     16, /* RGB565 */
     16, /* BGR565 */
     18, /* RGB666 */
-    24, /* RGB888 */
+    32, /* RGB888 */
     32, /* ARGB888 */
 };
 

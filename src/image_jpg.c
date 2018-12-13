@@ -795,7 +795,11 @@ static rt_bool_t rtgui_image_jpeg_load(struct rtgui_image *image, struct rtgui_f
             jpeg->byte_per_pixel = 2;
         }
         /* else use RGB888 format */
-        else jpeg->byte_per_pixel = 3;
+        else
+        {
+            jpeg->tjpgd.format = 0;
+            jpeg->byte_per_pixel = 3;
+        }
 
         image->w = (rt_uint16_t)jpeg->tjpgd.width;
         image->h = (rt_uint16_t)jpeg->tjpgd.height;
@@ -805,8 +809,12 @@ static rt_bool_t rtgui_image_jpeg_load(struct rtgui_image *image, struct rtgui_f
 
         if (jpeg->is_loaded == RT_TRUE)
         {
-            jpeg->pixels = (rt_uint8_t *)rtgui_malloc(
-                               jpeg->byte_per_pixel * image->w * image->h);
+            rt_uint8_t *pixels = RT_NULL;
+            
+            if (jpeg->tjpgd.format == 0)
+                pixels = (rt_uint8_t *)rtgui_malloc(4 * image->w * image->h);
+
+            jpeg->pixels = (rt_uint8_t *)rtgui_malloc(jpeg->byte_per_pixel * image->w * image->h);
             if (jpeg->pixels == RT_NULL)
             {
                 rt_kprintf("TJPGD err: no mem to load (%d)\n",
@@ -819,6 +827,24 @@ static rt_bool_t rtgui_image_jpeg_load(struct rtgui_image *image, struct rtgui_f
 
             rtgui_filerw_close(jpeg->filerw);
             jpeg->filerw = RT_NULL;
+
+            if (jpeg->tjpgd.format == 0 && pixels)
+            {
+                rt_uint8_t *dstp = pixels, *srcp = jpeg->pixels;
+
+                while (srcp < jpeg->pixels + jpeg->byte_per_pixel * image->w * image->h)
+                {
+                    *dstp++ = *(srcp + 2);
+                    *dstp++ = *(srcp + 1);
+                    *dstp++ = *(srcp);
+                    *dstp++ = 255;
+                    srcp += 3;
+                }
+
+                rtgui_free(jpeg->pixels);
+                jpeg->pixels = pixels;
+                jpeg->byte_per_pixel = 4;
+            }
         }
         res = RT_TRUE;
     }
@@ -932,7 +958,7 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image,
                 (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB565 && jpeg->tjpgd.format == 1))
         {
             rt_uint16_t imageWidth = image->w * jpeg->byte_per_pixel;
-            rt_uint8_t *src = jpeg->pixels + yoff * imageWidth + xoff + jpeg->byte_per_pixel;
+            rt_uint8_t *src = jpeg->pixels + yoff * imageWidth + xoff * jpeg->byte_per_pixel;
 
             for (y = 0; y < h; y++)
             {
@@ -954,7 +980,7 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image,
             info.src = jpeg->pixels + yoff * image->w * jpeg->byte_per_pixel + xoff * jpeg->byte_per_pixel;
             info.src_h = rtgui_rect_height(*dst_rect);
             info.src_w = rtgui_rect_width(*dst_rect);
-            info.src_fmt = (jpeg->tjpgd.format == 0? RTGRAPHIC_PIXEL_FORMAT_RGB888 : RTGRAPHIC_PIXEL_FORMAT_RGB565);
+            info.src_fmt = (jpeg->tjpgd.format == 0 ? RTGRAPHIC_PIXEL_FORMAT_RGB888 : RTGRAPHIC_PIXEL_FORMAT_RGB565);
             info.src_pitch = image->w * jpeg->byte_per_pixel;
             info.src_skip = info.src_pitch - info.src_w * jpeg->byte_per_pixel;
 
