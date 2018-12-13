@@ -408,7 +408,7 @@ rtgui_region_appendNonO(
 
     newRects = rEnd - r;
 
-    RT_ASSERT(y1 <= y2);
+    RT_ASSERT(y1 < y2);
     RT_ASSERT(newRects != 0);
 
     /* Make sure we have enough space for all rectangles to be added */
@@ -616,7 +616,7 @@ rtgui_op(
             {
                 top = RTGUI_MAX(r1y1, ybot);
                 bot = RTGUI_MIN(r1->y2, r2y1);
-                if (top <= bot)
+                if (top < bot)
                 {
                     curBand = newReg->data->numRects;
                     rtgui_region_appendNonO(newReg, r1, r1BandEnd, top, bot);
@@ -631,7 +631,7 @@ rtgui_op(
             {
                 top = RTGUI_MAX(r2y1, ybot);
                 bot = RTGUI_MIN(r2->y2, r1y1);
-                if (top <= bot)
+                if (top < bot)
                 {
                     curBand = newReg->data->numRects;
                     rtgui_region_appendNonO(newReg, r2, r2BandEnd, top, bot);
@@ -681,21 +681,29 @@ rtgui_op(
     {
         /* Do first nonOverlap1Func call, which may be able to coalesce */
         FindBand(r1, r1BandEnd, r1End, r1y1);
-        curBand = newReg->data->numRects;
-        rtgui_region_appendNonO(newReg, r1, r1BandEnd, RTGUI_MAX(r1y1, ybot), r1->y2);
-        Coalesce(newReg, prevBand, curBand);
-        /* Just append the rest of the boxes  */
-        AppendRegions(newReg, r1BandEnd, r1End);
+
+        if (RTGUI_MAX(r1y1, ybot) < r1->y2)
+        {
+            curBand = newReg->data->numRects;
+            rtgui_region_appendNonO(newReg, r1, r1BandEnd, RTGUI_MAX(r1y1, ybot), r1->y2);
+            Coalesce(newReg, prevBand, curBand);
+            /* Just append the rest of the boxes  */
+            AppendRegions(newReg, r1BandEnd, r1End);
+        }
     }
     else if ((r2 != r2End) && appendNon2)
     {
         /* Do first nonOverlap2Func call, which may be able to coalesce */
         FindBand(r2, r2BandEnd, r2End, r2y1);
-        curBand = newReg->data->numRects;
-        rtgui_region_appendNonO(newReg, r2, r2BandEnd, RTGUI_MAX(r2y1, ybot), r2->y2);
-        Coalesce(newReg, prevBand, curBand);
-        /* Append rest of boxes */
-        AppendRegions(newReg, r2BandEnd, r2End);
+
+        if (RTGUI_MAX(r2y1, ybot) < r2->y2)
+        {
+            curBand = newReg->data->numRects;
+            rtgui_region_appendNonO(newReg, r2, r2BandEnd, RTGUI_MAX(r2y1, ybot), r2->y2);
+            Coalesce(newReg, prevBand, curBand);
+            /* Append rest of boxes */
+            AppendRegions(newReg, r2BandEnd, r2End);
+        }
     }
 
     if (oldData)

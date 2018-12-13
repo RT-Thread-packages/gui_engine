@@ -379,6 +379,46 @@ static void _rgb565p_draw_vline(rtgui_color_t *c, int x , int y1, int y2)
     }
 }
 
+static void _rgb888_set_pixel(rtgui_color_t *c, int x, int y)
+{
+    *GET_PIXEL(rtgui_graphic_get_device(), x, y, rtgui_color_t) = *c;
+}
+
+static void _rgb888_get_pixel(rtgui_color_t *c, int x, int y)
+{
+    *c = ((rtgui_color_t)*GET_PIXEL(rtgui_graphic_get_device(), x, y, rtgui_color_t) & 0xFFFFFF) + 0xFF000000;
+}
+
+static void _rgb888_draw_hline(rtgui_color_t *c, int x1, int x2, int y)
+{
+    int index;
+    rtgui_color_t *pixel_ptr;
+
+    /* get pixel pointer in framebuffer */
+    pixel_ptr = GET_PIXEL(rtgui_graphic_get_device(), x1, y, rtgui_color_t);
+
+    for (index = x1; index < x2; index++)
+    {
+        *pixel_ptr = *c;
+        pixel_ptr++;
+    }
+}
+
+static void _rgb888_draw_vline(rtgui_color_t *c, int x, int y1, int y2)
+{
+    struct rtgui_graphic_driver *drv;
+    rtgui_color_t *dst;
+    int index;
+
+    drv = rtgui_graphic_get_device();
+    dst = GET_PIXEL(drv, x, y1, rtgui_color_t);
+    for (index = y1; index < y2; index++)
+    {
+        *dst = *c;
+        dst += drv->width;
+    }
+}
+
 static void _argb888_set_pixel(rtgui_color_t *c, int x, int y)
 {
     *GET_PIXEL(rtgui_graphic_get_device(), x, y, rtgui_color_t) = *c;
@@ -428,7 +468,7 @@ static void framebuffer_draw_raw_hline(rt_uint8_t *pixels, int x1, int x2, int y
     drv = rtgui_graphic_get_device();
     dst = GET_PIXEL(drv, x1, y, rt_uint8_t);
     memcpy(dst, pixels,
-              (x2 - x1) * _UI_BITBYTES(drv->bits_per_pixel));
+           (x2 - x1) * _UI_BITBYTES(drv->bits_per_pixel));
 }
 
 const struct rtgui_graphic_driver_ops _framebuffer_rgb565_ops =
@@ -446,6 +486,15 @@ const struct rtgui_graphic_driver_ops _framebuffer_rgb565p_ops =
     _rgb565p_get_pixel,
     _rgb565p_draw_hline,
     _rgb565p_draw_vline,
+    framebuffer_draw_raw_hline,
+};
+
+const struct rtgui_graphic_driver_ops _framebuffer_rgb888_ops =
+{
+    _rgb888_set_pixel,
+    _rgb888_get_pixel,
+    _rgb888_draw_hline,
+    _rgb888_draw_vline,
     framebuffer_draw_raw_hline,
 };
 
@@ -554,6 +603,8 @@ const struct rtgui_graphic_driver_ops *rtgui_framebuffer_get_ops(int pixel_forma
         return &_framebuffer_rgb565_ops;
     case RTGRAPHIC_PIXEL_FORMAT_RGB565P:
         return &_framebuffer_rgb565p_ops;
+    case RTGRAPHIC_PIXEL_FORMAT_RGB888:
+        return &_framebuffer_rgb888_ops;
     case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
         return &_framebuffer_argb888_ops;
     default:
