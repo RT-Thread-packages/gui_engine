@@ -543,15 +543,14 @@ static void _draw_text(struct rtgui_dc *dc,
         err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
         if (err == 0 && ftcSBit->width != 0)
         {
-            if (first == RT_TRUE && ftcSBit->left < 0)
+            if (first == RT_TRUE)
             {
-                begin_x += 0;
+                if (ftcSBit->left < 0)
+                    begin_x -= ftcSBit->left;
                 first = RT_FALSE;
             }
-            else
-            {
-                begin_x += ftcSBit->left;
-            }
+
+            begin_x += ftcSBit->left;
 
             _draw_bitmap(dc, ftcSBit, begin_x, btm_y, fgc, right, bottom);
 
@@ -651,15 +650,13 @@ _out:
 
 static void _get_metrics(struct rtgui_ttf_font *ttf_font, const rt_uint16_t *text_short, struct rtgui_rect *rect)
 {
+    FT_Error err = 0;
     FTC_SBit ftcSBit = RT_NULL;
     rt_int16_t w = 0, top = 0, btm = 0;
 
     while (*text_short)
     {
-        FT_Error err = 0;
-        int glyphIndex;
-
-        glyphIndex = FTC_CMapCache_Lookup(ttf_font->ttf->cmap_cache, &ttf_font->ttf->face_id, 0, *text_short);
+        int glyphIndex = FTC_CMapCache_Lookup(ttf_font->ttf->cmap_cache, &ttf_font->ttf->face_id, 0, *text_short);
 
         err = FTC_SBitCache_Lookup(ttf_font->ttf->sbit_cache, &ttf_font->image_type_rec, glyphIndex, &ftcSBit, 0);
         if (err == 0 && ftcSBit->width != 0)
@@ -667,9 +664,12 @@ static void _get_metrics(struct rtgui_ttf_font *ttf_font, const rt_uint16_t *tex
             PINFO(" bitmap : <left, top, width, height, xadvance, yadvance> %c (%d, %d, %d, %d, %d, %d)\n",
                   *text_short, ftcSBit->left, ftcSBit->top, ftcSBit->width, ftcSBit->height, ftcSBit->xadvance, ftcSBit->yadvance);
 
-            if (w == 0 && ftcSBit->left < 0)
+            if (w == 0)
             {
-                w += ftcSBit->xadvance - ftcSBit->left;
+                if (ftcSBit->left < 0)
+                    w += ftcSBit->xadvance - ftcSBit->left;
+                else
+                    w += ftcSBit->xadvance + ftcSBit->left;
             }
             else
             {
@@ -685,6 +685,14 @@ static void _get_metrics(struct rtgui_ttf_font *ttf_font, const rt_uint16_t *tex
         }
 
         text_short ++;
+    }
+
+    if (err == 0 && ftcSBit->width != 0)
+    {
+        if (ftcSBit->xadvance <= ftcSBit->width + ftcSBit->left)
+        {
+            w += ftcSBit->width + ftcSBit->left - ftcSBit->xadvance;
+        }
     }
 
     rect->x1 = 0;
