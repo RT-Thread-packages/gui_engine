@@ -811,7 +811,7 @@ static rt_bool_t rtgui_image_jpeg_load(struct rtgui_image *image, struct rtgui_f
         {
             rt_uint8_t *pixels = RT_NULL;
             
-            if (jpeg->tjpgd.format == 0)
+            if (jpeg->tjpgd.format == 0 && PKG_USING_RGB888_PIXEL_BITS == 32)
                 pixels = (rt_uint8_t *)rtgui_malloc(4 * image->w * image->h);
 
             jpeg->pixels = (rt_uint8_t *)rtgui_malloc(jpeg->byte_per_pixel * image->w * image->h);
@@ -926,33 +926,7 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image,
     w = _UI_MIN(image->w - xoff, rtgui_rect_width (*dst_rect));
     h = _UI_MIN(image->h - yoff, rtgui_rect_height(*dst_rect));
 
-    if (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB888 &&
-            jpeg->tjpgd.format != 0)
-    {
-        jpeg->tjpgd.format = 0;
-        jpeg->byte_per_pixel = 3;
-    }
-    else if (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB565 &&
-             jpeg->tjpgd.format != 1)
-    {
-        jpeg->tjpgd.format = 1;
-        jpeg->byte_per_pixel = 2;
-    }
-
-    if (!jpeg->is_loaded)
-    {
-        JRESULT ret;
-
-        /* TODO support xoff/yoff. */
-        jpeg->dst_x = dst_rect->x1;
-        jpeg->dst_y = dst_rect->y1;
-        jpeg->dst_w = w;
-        jpeg->dst_h = h;
-        ret = jd_decomp(&jpeg->tjpgd, tjpgd_out_func, 0);
-        if (ret != JDR_OK)
-            return;
-    }
-    else
+    if (jpeg->pixels)
     {
         if ((rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB888 && jpeg->tjpgd.format == 0) ||
                 (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB565 && jpeg->tjpgd.format == 1))

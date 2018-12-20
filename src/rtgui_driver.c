@@ -381,16 +381,38 @@ static void _rgb565p_draw_vline(rtgui_color_t *c, int x , int y1, int y2)
 
 static void _rgb888_set_pixel(rtgui_color_t *c, int x, int y)
 {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
     *GET_PIXEL(rtgui_graphic_get_device(), x, y, rtgui_color_t) = *c;
+#else
+    rt_uint8_t *pixel = GET_PIXEL(rtgui_graphic_get_device(), x, y, rt_uint8_t);
+
+    *pixel = (*c >> 16) & 0xFF;
+    pixel++;
+    *pixel = (*c >> 8) & 0xFF;
+    pixel++;
+    *pixel = (*c) & 0xFF;
+#endif // PKG_USING_RGB888_PIXEL_BITS_32
 }
 
 static void _rgb888_get_pixel(rtgui_color_t *c, int x, int y)
 {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
     *c = ((rtgui_color_t)*GET_PIXEL(rtgui_graphic_get_device(), x, y, rtgui_color_t) & 0xFFFFFF) + 0xFF000000;
+#else
+    rt_uint8_t *pixel = GET_PIXEL(rtgui_graphic_get_device(), x, y, rt_uint8_t);
+
+    *c = 0xFF000000;
+    *c = (*pixel << 16);
+    pixel++;
+    *c = (*pixel << 8);
+    pixel++;
+    *c = (*pixel);
+#endif // PKG_USING_RGB888_PIXEL_BITS_32 
 }
 
 static void _rgb888_draw_hline(rtgui_color_t *c, int x1, int x2, int y)
 {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
     int index;
     rtgui_color_t *pixel_ptr;
 
@@ -402,10 +424,28 @@ static void _rgb888_draw_hline(rtgui_color_t *c, int x1, int x2, int y)
         *pixel_ptr = *c;
         pixel_ptr++;
     }
+#else
+    int index;
+    rt_uint8_t *pixel_ptr;
+
+    /* get pixel pointer in framebuffer */
+    pixel_ptr = GET_PIXEL(rtgui_graphic_get_device(), x1, y, rt_uint8_t);
+
+    for (index = x1; index < x2; index++)
+    {
+        *pixel_ptr = (*c >> 16) & 0xFF;
+        pixel_ptr++;
+        *pixel_ptr = (*c >> 8) & 0xFF;
+        pixel_ptr++;
+        *pixel_ptr = (*c) & 0xFF;
+        pixel_ptr++;
+    }
+#endif // PKG_USING_RGB888_PIXEL_BITS_32 
 }
 
 static void _rgb888_draw_vline(rtgui_color_t *c, int x, int y1, int y2)
 {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
     struct rtgui_graphic_driver *drv;
     rtgui_color_t *dst;
     int index;
@@ -417,6 +457,24 @@ static void _rgb888_draw_vline(rtgui_color_t *c, int x, int y1, int y2)
         *dst = *c;
         dst += drv->width;
     }
+#else
+    struct rtgui_graphic_driver *drv;
+    rt_uint8_t *dst;
+    int index;
+
+    drv = rtgui_graphic_get_device();
+    dst = GET_PIXEL(drv, x, y1, rt_uint8_t);
+    for (index = y1; index < y2; index++)
+    {
+        *dst = (*c >> 16) & 0xFF;
+        dst++;
+        *dst = (*c >> 8) & 0xFF;
+        dst++;
+        *dst = (*c) & 0xFF;
+        dst++;
+        dst += drv->width;
+    }
+#endif // PKG_USING_RGB888_PIXEL_BITS_32 
 }
 
 static void _argb888_set_pixel(rtgui_color_t *c, int x, int y)
