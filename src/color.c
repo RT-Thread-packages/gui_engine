@@ -22,6 +22,7 @@
  * 2009-10-16     Bernard      first version
  */
 #include <rtgui/color.h>
+#include <rtconfig.h>
 
 const rtgui_color_t red     = RTGUI_RGB(0xff, 0x00, 0x00);
 const rtgui_color_t green   = RTGUI_RGB(0x00, 0xff, 0x00);
@@ -43,7 +44,7 @@ const static rt_uint8_t pixel_bits_table[] =
     16, /* RGB565 */
     16, /* BGR565 */
     18, /* RGB666 */
-    32, /* RGB888 */
+    PKG_USING_RGB888_PIXEL_BITS, /* RGB888 */
     32, /* ARGB888 */
 };
 
