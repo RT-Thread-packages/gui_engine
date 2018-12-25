@@ -599,6 +599,8 @@ void rtgui_widget_show(struct rtgui_widget *widget)
 
     if (widget->toplevel != RT_NULL)
     {
+        rtgui_widget_update_clip(widget);
+
         RTGUI_EVENT_SHOW_INIT(&eshow);
         if (RTGUI_OBJECT(widget)->event_handler != RT_NULL)
         {
