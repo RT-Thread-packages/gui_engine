@@ -493,7 +493,7 @@ static void _draw_bitmap(struct rtgui_dc *dc,
             dest_buf = (struct rtgui_dc_buffer*)text_dc;
 
             /* blit source */
-            info.a = 0;
+            info.a = 255;
             info.src = (rt_uint8_t *)bitmap->buffer;
             info.src_fmt = RTGRAPHIC_PIXEL_FORMAT_ALPHA;
             info.src_w = bitmap->width;

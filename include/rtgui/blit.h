@@ -62,10 +62,22 @@
 {                                                                       \
     Pixel = ((r>>3)<<10)|((g>>3)<<5)|(b>>3);                            \
 }
+
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define RGB888_FROM_RGB(Pixel, r, g, b)                                 \
 {                                                                       \
     Pixel = (r<<16)|(g<<8)|b;                                           \
 }
+#else
+#define RGB888_FROM_RGB(Pixel, r, g, b)                                 \
+{                                                                       \
+    rt_uint8_t *p = &Pixel;                                             \
+    *p++ = r;                                                           \
+    *p++ = g;                                                           \
+    *p = b;                                                             \
+}
+#endif
+
 #define ARGB8888_FROM_RGBA(Pixel, r, g, b, a)                           \
 {                                                                       \
     Pixel = (a<<24)|(r<<16)|(g<<8)|b;                                   \
@@ -110,12 +122,23 @@
     g = rtgui_blit_expand_byte[3][((Pixel&0x03E0)>>5)];                 \
     b = rtgui_blit_expand_byte[3][(Pixel&0x001F)];                      \
 }
+
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define RGB_FROM_RGB888(Pixel, r, g, b)                                 \
 {                                                                       \
     r = ((Pixel&0xFF0000)>>16);                                         \
     g = ((Pixel&0xFF00)>>8);                                            \
     b = (Pixel&0xFF);                                                   \
 }
+#else
+#define RGB_FROM_RGB888(Pixel, r, g, b)                                 \
+{                                                                       \
+    rt_uint8_t *p = &Pixel;                                             \
+    r = *p++;                                                           \
+    g = *p++;                                                           \
+    b = *p;                                                             \
+}
+#endif
 
 #define RGBA_FROM_RGBA8888(Pixel, r, g, b, a)                           \
 {                                                                       \

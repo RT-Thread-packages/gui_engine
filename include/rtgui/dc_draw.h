@@ -59,6 +59,14 @@
 
 #define DRAW_FASTSETPIXEL1 DRAW_FASTSETPIXEL(rt_uint8_t)
 #define DRAW_FASTSETPIXEL2 DRAW_FASTSETPIXEL(rt_uint16_t)
+#define DRAW_FASTSETPIXEL3 \
+    do { \
+        rt_uint8_t *p = (rt_uint8_t *)pixel; \
+        *p++ = ((color & 0xFF0000) >> 16); \
+        *p++ = ((color & 0xFF00) >> 8); \
+        *p = (color & 0xFF); \
+    } while (0)
+
 #define DRAW_FASTSETPIXEL4 DRAW_FASTSETPIXEL(rt_uint32_t)
 
 #define DRAW_FASTSETPIXELXY(x, y, type, bpp, color) \
@@ -66,6 +74,14 @@
 
 #define DRAW_FASTSETPIXELXY1(x, y) DRAW_FASTSETPIXELXY(x, y, rt_uint8_t, 1, color)
 #define DRAW_FASTSETPIXELXY2(x, y) DRAW_FASTSETPIXELXY(x, y, rt_uint16_t, 2, color)
+#define DRAW_FASTSETPIXELXY3(x, y) \
+	do{ \
+	    rt_uint8_t *p = (rt_uint8_t *)(_dc_get_pixel(dst, x, y)); \
+	    *p++ = ((color & 0xFF0000) >> 16); \
+	    *p++ = ((color & 0xFF00) >> 8); \
+	    *p = (color & 0xFF); \
+	} while (0)
+	
 #define DRAW_FASTSETPIXELXY4(x, y) DRAW_FASTSETPIXELXY(x, y, rt_uint32_t, 4, color)
 
 #define DRAW_SETPIXEL(setpixel) \
@@ -149,8 +165,14 @@ do { \
     DRAW_SETPIXEL(RGB565_FROM_RGB(*pixel, sr, sg, sb))
 
 #define DRAW_SETPIXEL_BLEND_RGB565 \
-    DRAW_SETPIXEL_BLEND(RGB_FROM_RGB565(*pixel, sr, sg, sb), \
-                        RGB565_FROM_RGB(*pixel, sr, sg, sb))
+    do { \
+        unsigned sr, sg, sb; \
+        RGB_FROM_RGB565(*pixel, sr, sg, sb); \
+        sr = ((r * a) + (inva * sr)) * 257 >> 16; \
+        sg = ((g * a) + (inva * sg)) * 257 >> 16; \
+        sb = ((b * a) + (inva * sb)) * 257 >> 16; \
+        RGB565_FROM_RGB(*pixel, sr, sg, sb); \
+    } while (0)
 
 #define DRAW_SETPIXEL_ADD_RGB565 \
     DRAW_SETPIXEL_ADD(RGB_FROM_RGB565(*pixel, sr, sg, sb), \
@@ -211,8 +233,14 @@ do { \
     DRAW_SETPIXEL(RGB888_FROM_RGB(*pixel, sr, sg, sb))
 
 #define DRAW_SETPIXEL_BLEND_RGB888 \
-    DRAW_SETPIXEL_BLEND(RGB_FROM_RGB888(*pixel, sr, sg, sb), \
-                        RGB888_FROM_RGB(*pixel, sr, sg, sb))
+    do { \
+        unsigned sr, sg, sb; \
+        RGB_FROM_RGB888(*pixel, sr, sg, sb); \
+        sr = ((r * a) + (inva * sr)) >> 8; \
+        sg = ((g * a) + (inva * sg)) >> 8; \
+        sb = ((b * a) + (inva * sb)) >> 8; \
+        RGB888_FROM_RGB(*pixel, sr, sg, sb); \
+    } while (0)
 
 #define DRAW_SETPIXEL_ADD_RGB888 \
     DRAW_SETPIXEL_ADD(RGB_FROM_RGB888(*pixel, sr, sg, sb), \
@@ -222,17 +250,37 @@ do { \
     DRAW_SETPIXEL_MOD(RGB_FROM_RGB888(*pixel, sr, sg, sb), \
                       RGB888_FROM_RGB(*pixel, sr, sg, sb))
 
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define DRAW_SETPIXELXY_RGB888(x, y) \
     DRAW_SETPIXELXY(x, y, rt_uint32_t, 4, DRAW_SETPIXEL_RGB888)
+#else
+#define DRAW_SETPIXELXY_RGB888(x, y) \
+    DRAW_SETPIXELXY(x, y, rt_uint8_t, 3, DRAW_SETPIXEL_RGB888)
+#endif
 
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define DRAW_SETPIXELXY_BLEND_RGB888(x, y) \
     DRAW_SETPIXELXY(x, y, rt_uint32_t, 4, DRAW_SETPIXEL_BLEND_RGB888)
+#else
+#define DRAW_SETPIXELXY_BLEND_RGB888(x, y) \
+    DRAW_SETPIXELXY(x, y, rt_uint8_t, 3, DRAW_SETPIXEL_BLEND_RGB888)
+#endif
 
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define DRAW_SETPIXELXY_ADD_RGB888(x, y) \
     DRAW_SETPIXELXY(x, y, rt_uint32_t, 4, DRAW_SETPIXEL_ADD_RGB888)
+#else
+#define DRAW_SETPIXELXY_ADD_RGB888(x, y) \
+    DRAW_SETPIXELXY(x, y, rt_uint8_t, 3, DRAW_SETPIXEL_ADD_RGB888)
+#endif
 
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
 #define DRAW_SETPIXELXY_MOD_RGB888(x, y) \
     DRAW_SETPIXELXY(x, y, rt_uint32_t, 4, DRAW_SETPIXEL_MOD_RGB888)
+#else
+#define DRAW_SETPIXELXY_MOD_RGB888(x, y) \
+    DRAW_SETPIXELXY(x, y, rt_uint8_t, 3, DRAW_SETPIXEL_MOD_RGB888)
+#endif
 
 /*
  * Define draw operators for ARGB8888
@@ -242,8 +290,25 @@ do { \
     DRAW_SETPIXEL(ARGB8888_FROM_RGBA(*pixel, sr, sg, sb, sa))
 
 #define DRAW_SETPIXEL_BLEND_ARGB8888 \
-    DRAW_SETPIXEL_BLEND(RGBA_FROM_ARGB8888(*pixel, sr, sg, sb, sa), \
-                        ARGB8888_FROM_RGBA(*pixel, sr, sg, sb, sa))
+    do { \
+        unsigned sr, sg, sb, sa; \
+        RGBA_FROM_ARGB8888(*pixel, sr, sg, sb, sa); \
+        if (sa) \
+        {   \
+            sa = a + (inva * sa + 128) / 255; \
+            sr = ((r * a) + (inva * sr)) >> 8; \
+            sg = ((g * a) + (inva * sg)) >> 8; \
+            sb = ((b * a) + (inva * sb)) >> 8; \
+        }   \
+        else \
+        { \
+            sa = a; \
+            sr = r; \
+            sg = g; \
+            sb = g; \
+        } \
+        ARGB8888_FROM_RGBA(*pixel, sr, sg, sb, sa); \
+    } while (0)
 
 #define DRAW_SETPIXEL_ADD_ARGB8888 \
     DRAW_SETPIXEL_ADD(RGBA_FROM_ARGB8888(*pixel, sr, sg, sb, sa), \
@@ -275,6 +340,7 @@ do { \
 #define HLINE(type, op, draw_end) \
 { \
     int length; \
+    int inc_size = _UI_BITBYTES(_dc_get_bits_per_pixel(dst)) / sizeof(type); \
     type *pixel; \
     if (x1 <= x2) { \
         pixel = (type *)_dc_get_pixel(dst, x1, y1); \
@@ -282,13 +348,13 @@ do { \
     } else { \
         pixel = (type *)_dc_get_pixel(dst, x2, y1); \
         if (!draw_end) { \
-            ++pixel; \
+            pixel += inc_size; \
         } \
         length = draw_end ? (x1-x2+1) : (x1-x2); \
     } \
     while (length--) { \
         op; \
-        ++pixel; \
+        pixel += inc_size; \
     } \
 }
 
@@ -296,21 +362,23 @@ do { \
 #define VLINE(type, op, draw_end) \
 { \
     int length; \
-    int pitch = _dc_get_pitch(dst)/(_UI_BITBYTES(_dc_get_bits_per_pixel(dst))); \
+    int inc_size = _UI_BITBYTES(_dc_get_bits_per_pixel(dst)); \
+    int pitch = _dc_get_pitch(dst) / inc_size; \
     type *pixel; \
+    inc_size = inc_size / sizeof(type); \
     if (y1 <= y2) { \
         pixel = (type *)_dc_get_pixel(dst, x1, y1); \
         length = draw_end ? (y2-y1+1) : (y2-y1); \
     } else { \
         pixel = (type *)_dc_get_pixel(dst, x1, y2); \
         if (!draw_end) { \
-            pixel += pitch; \
+            pixel += pitch * inc_size; \
         } \
         length = draw_end ? (y1-y2+1) : (y1-y2); \
     } \
     while (length--) { \
         op; \
-        pixel += pitch; \
+        pixel += pitch * inc_size; \
     } \
 }
 
@@ -318,8 +386,10 @@ do { \
 #define DLINE(type, op, draw_end) \
 { \
     int length; \
-    int pitch = _dc_get_pitch(dst)/(_UI_BITBYTES(_dc_get_bits_per_pixel(dst))); \
+    int inc_size = _UI_BITBYTES(_dc_get_bits_per_pixel(dst)); \
+    int pitch = _dc_get_pitch(dst) / inc_size; \
     type *pixel; \
+    inc_size = inc_size / sizeof(type); \
     if (y1 <= y2) { \
         pixel = (type *)_dc_get_pixel(dst, x1, y1); \
         if (x1 <= x2) { \
@@ -336,7 +406,7 @@ do { \
             --pitch; \
         } \
         if (!draw_end) { \
-            pixel += pitch; \
+            pixel += pitch * inc_size; \
         } \
         length = (y1-y2); \
     } \
@@ -345,7 +415,7 @@ do { \
     } \
     while (length--) { \
         op; \
-        pixel += pitch; \
+        pixel += pitch * inc_size; \
     } \
 }
 
@@ -531,20 +601,22 @@ do { \
 do { \
     int width = rect->x2 - rect->x1; \
     int height = rect->y2 - rect->y1; \
-    int pitch = _dc_get_pitch(dst)/(_UI_BITBYTES(_dc_get_bits_per_pixel(dst))); \
+    int inc_size = _UI_BITBYTES(_dc_get_bits_per_pixel(dst)); \
+    int pitch = _dc_get_pitch(dst) / inc_size; \
     int skip = pitch - width; \
     type *pixel = (type *)_dc_get_pixel(dst, rect->x1, rect->y1); \
+    inc_size = inc_size / sizeof(type); \
     while (height--) { \
         { int n = (width+3)/4; \
             switch (width & 3) { \
-            case 0: do {   op; pixel++; \
-            case 3:        op; pixel++; \
-            case 2:        op; pixel++; \
-            case 1:        op; pixel++; \
+            case 0: do {   op; pixel += inc_size; \
+            case 3:        op; pixel += inc_size; \
+            case 2:        op; pixel += inc_size; \
+            case 1:        op; pixel += inc_size; \
                     } while ( --n > 0 ); \
             } \
         } \
-        pixel += skip; \
+        pixel += skip * inc_size; \
     } \
 } while (0)
 
