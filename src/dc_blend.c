@@ -408,6 +408,36 @@ _dc_draw_line2(struct rtgui_dc * dst, int x1, int y1, int x2, int y2, rtgui_colo
 }
 
 static void
+_dc_draw_line3(struct rtgui_dc * dst, int x1, int y1, int x2, int y2, rtgui_color_t color,
+               rt_bool_t draw_end)
+{
+    if (y1 == y2)
+    {
+        HLINE(rt_uint8_t, DRAW_FASTSETPIXEL3, draw_end);
+    }
+    else if (x1 == x2)
+    {
+        VLINE(rt_uint8_t, DRAW_FASTSETPIXEL3, draw_end);
+    }
+    else if (ABS(x1 - x2) == ABS(y1 - y2))
+    {
+        DLINE(rt_uint8_t, DRAW_FASTSETPIXEL3, draw_end);
+    }
+    else
+    {
+        rt_uint8_t _r, _g, _b, _a;
+        _r = RTGUI_RGB_R(color);
+        _g = RTGUI_RGB_G(color);
+        _b = RTGUI_RGB_B(color);
+        _a = RTGUI_RGB_A(color);
+
+        AALINE(x1, y1, x2, y2,
+               DRAW_FASTSETPIXELXY3, DRAW_SETPIXELXY_BLEND_RGB888,
+               draw_end);
+    }
+}
+
+static void
 _dc_draw_line4(struct rtgui_dc * dst, int x1, int y1, int x2, int y2, rtgui_color_t color,
                rt_bool_t draw_end)
 {
@@ -459,6 +489,8 @@ _dc_calc_draw_line_func(int bpp)
         return _dc_draw_line1;
     case 2:
         return _dc_draw_line2;
+    case 3:
+        return _dc_draw_line3;
     case 4:
         return _dc_draw_line4;
     }
@@ -1126,6 +1158,7 @@ _dc_blend_line_rgb888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
     {
         switch (blendMode)
         {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
         case RTGUI_BLENDMODE_BLEND:
             HLINE(rt_uint32_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
             break;
@@ -1138,12 +1171,27 @@ _dc_blend_line_rgb888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
         default:
             HLINE(rt_uint32_t, DRAW_SETPIXEL_RGB888, draw_end);
             break;
+#else
+        case RTGUI_BLENDMODE_BLEND:
+            HLINE(rt_uint8_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_ADD:
+            HLINE(rt_uint8_t, DRAW_SETPIXEL_ADD_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_MOD:
+            HLINE(rt_uint8_t, DRAW_SETPIXEL_MOD_RGB888, draw_end);
+            break;
+        default:
+            HLINE(rt_uint8_t, DRAW_SETPIXEL_RGB888, draw_end);
+            break;
+#endif
         }
     }
     else if (x1 == x2)
     {
         switch (blendMode)
         {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
         case RTGUI_BLENDMODE_BLEND:
             VLINE(rt_uint32_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
             break;
@@ -1156,12 +1204,27 @@ _dc_blend_line_rgb888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
         default:
             VLINE(rt_uint32_t, DRAW_SETPIXEL_RGB888, draw_end);
             break;
+#else
+        case RTGUI_BLENDMODE_BLEND:
+            VLINE(rt_uint8_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_ADD:
+            VLINE(rt_uint8_t, DRAW_SETPIXEL_ADD_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_MOD:
+            VLINE(rt_uint8_t, DRAW_SETPIXEL_MOD_RGB888, draw_end);
+            break;
+        default:
+            VLINE(rt_uint8_t, DRAW_SETPIXEL_RGB888, draw_end);
+            break;
+#endif
         }
     }
     else if (ABS(x1 - x2) == ABS(y1 - y2))
     {
         switch (blendMode)
         {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
         case RTGUI_BLENDMODE_BLEND:
             DLINE(rt_uint32_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
             break;
@@ -1174,6 +1237,20 @@ _dc_blend_line_rgb888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
         default:
             DLINE(rt_uint32_t, DRAW_SETPIXEL_RGB888, draw_end);
             break;
+#else
+        case RTGUI_BLENDMODE_BLEND:
+            DLINE(rt_uint8_t, DRAW_SETPIXEL_BLEND_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_ADD:
+            DLINE(rt_uint8_t, DRAW_SETPIXEL_ADD_RGB888, draw_end);
+            break;
+        case RTGUI_BLENDMODE_MOD:
+            DLINE(rt_uint8_t, DRAW_SETPIXEL_MOD_RGB888, draw_end);
+            break;
+        default:
+            DLINE(rt_uint8_t, DRAW_SETPIXEL_RGB888, draw_end);
+            break;
+#endif
         }
     }
     else
@@ -1542,6 +1619,7 @@ _dc_blend_fill_rect_rgb888(struct rtgui_dc * dst, const rtgui_rect_t * rect,
 
     switch (blendMode)
     {
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
     case RTGUI_BLENDMODE_BLEND:
         FILLRECT(rt_uint32_t, DRAW_SETPIXEL_BLEND_RGB888);
         break;
@@ -1554,6 +1632,20 @@ _dc_blend_fill_rect_rgb888(struct rtgui_dc * dst, const rtgui_rect_t * rect,
     default:
         FILLRECT(rt_uint32_t, DRAW_SETPIXEL_RGB888);
         break;
+#else
+    case RTGUI_BLENDMODE_BLEND:
+        FILLRECT(rt_uint8_t, DRAW_SETPIXEL_BLEND_RGB888);
+        break;
+    case RTGUI_BLENDMODE_ADD:
+        FILLRECT(rt_uint8_t, DRAW_SETPIXEL_ADD_RGB888);
+        break;
+    case RTGUI_BLENDMODE_MOD:
+        FILLRECT(rt_uint8_t, DRAW_SETPIXEL_MOD_RGB888);
+        break;
+    default:
+        FILLRECT(rt_uint8_t, DRAW_SETPIXEL_RGB888);
+        break;
+#endif
     }
 }
 
@@ -1605,7 +1697,7 @@ rtgui_dc_blend_fill_rect(struct rtgui_dc* dst, const rtgui_rect_t *rect,
     b = RTGUI_RGB_B(color);
     a = RTGUI_RGB_A(color);
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(r, a);
         g = DRAW_MUL(g, a);
@@ -1690,8 +1782,8 @@ rtgui_dc_blend_fill_rect(struct rtgui_dc* dst, const rtgui_rect_t *rect,
 
         draw_rect.x1 = dc->owner->extent.x1 > 0 ? dc->owner->extent.x1 : 0;
         draw_rect.y1 = dc->owner->extent.y1 > 0 ? dc->owner->extent.y1 : 0;
-		draw_rect.x2 = draw_rect.x2 > hw_driver->width ? hw_driver->width : draw_rect.x2;
-		draw_rect.y2 = draw_rect.y2 > hw_driver->height ? hw_driver->height : draw_rect.y2;
+        draw_rect.x2 = draw_rect.x2 > hw_driver->width ? hw_driver->width : draw_rect.x2;
+        draw_rect.y2 = draw_rect.y2 > hw_driver->height ? hw_driver->height : draw_rect.y2;
 
         func(dst, &draw_rect, blendMode, r, g, b, a);
     }

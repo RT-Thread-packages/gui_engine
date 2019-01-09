@@ -678,7 +678,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
             buffer = (struct rtgui_dc_buffer*)dc;
 
             if (buffer->pixel_alpha == 0)
-                info.a = 0;
+                info.a = 255;
 
             info.dst = rtgui_dc_buffer_get_pixel(RTGUI_DC(buffer)) + dst_y * buffer->pitch +
                        dst_x * rtgui_color_get_bpp(buffer->pixel_format);

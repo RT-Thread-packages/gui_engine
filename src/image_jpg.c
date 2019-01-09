@@ -433,7 +433,7 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image, struct rtgui_dc *dc
             w = _UI_MIN(image->w, rtgui_rect_width(*rect));
             h = _UI_MIN(image->h, rtgui_rect_height(*rect));
 
-            info.a = 0;
+            info.a = 255;
 
             /* initialize source blit information */
             info.src_fmt = RTGRAPHIC_PIXEL_FORMAT_ARGB888;;

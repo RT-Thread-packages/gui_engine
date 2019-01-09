@@ -305,7 +305,11 @@ static void rtgui_dc_buffer_draw_vline(struct rtgui_dc *self, int x1, int y1, in
         VLINE(rt_uint16_t, DRAW_SETPIXEL_BGR565, 0);
         break;
     case RTGRAPHIC_PIXEL_FORMAT_RGB888:
-        VLINE(rt_uint16_t, DRAW_SETPIXEL_RGB888, 0);
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
+        VLINE(rt_uint32_t, DRAW_SETPIXEL_RGB888, 0);
+#else
+        VLINE(rt_uint8_t, DRAW_SETPIXEL_RGB888, 0);
+#endif
         break;
     case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
         VLINE(rt_uint32_t, DRAW_SETPIXEL_ARGB8888, 0);
@@ -341,7 +345,11 @@ static void rtgui_dc_buffer_draw_hline(struct rtgui_dc *self, int x1, int x2, in
         HLINE(rt_uint16_t, DRAW_SETPIXEL_BGR565, 0);
         break;
     case RTGRAPHIC_PIXEL_FORMAT_RGB888:
-        HLINE(rt_uint16_t, DRAW_SETPIXEL_RGB888, 0);
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
+        HLINE(rt_uint32_t, DRAW_SETPIXEL_RGB888, 0);
+#else
+        HLINE(rt_uint8_t, DRAW_SETPIXEL_RGB888, 0);
+#endif
         break;
     case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
         HLINE(rt_uint32_t, DRAW_SETPIXEL_ARGB8888, 0);
@@ -393,7 +401,11 @@ static void rtgui_dc_buffer_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
         FILLRECT(rt_uint16_t, DRAW_SETPIXEL_BGR565);
         break;
     case RTGRAPHIC_PIXEL_FORMAT_RGB888:
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
         FILLRECT(rt_uint32_t, DRAW_SETPIXEL_RGB888);
+#else
+        FILLRECT(rt_uint8_t, DRAW_SETPIXEL_RGB888);
+#endif
         break;
     case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
         FILLRECT(rt_uint32_t, DRAW_SETPIXEL_ARGB8888);
