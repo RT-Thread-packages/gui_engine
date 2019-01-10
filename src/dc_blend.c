@@ -805,7 +805,7 @@ rtgui_dc_blend_point(struct rtgui_dc * dst, int x, int y, enum RTGUI_BLENDMODE b
             return;
     }
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(r, a);
         g = DRAW_MUL(g, a);
@@ -846,7 +846,7 @@ rtgui_dc_blend_points(struct rtgui_dc *dst, const rtgui_point_t *points, int cou
     /* we do not support pixel DC */
     if (_dc_get_pixel(dst, 0, 0) == RT_NULL) return;
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(r, a);
         g = DRAW_MUL(g, a);
@@ -928,7 +928,7 @@ _dc_blend_line_rgb565(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
 {
     unsigned r, g, b, a, inva;
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(_r, _a);
         g = DRAW_MUL(_g, _a);
@@ -1033,7 +1033,7 @@ _dc_blend_line_bgr565(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
 {
     unsigned r, g, b, a, inva;
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(_r, _a);
         g = DRAW_MUL(_g, _a);
@@ -1138,7 +1138,7 @@ _dc_blend_line_rgb888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
 {
     unsigned r, g, b, a, inva;
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(_r, _a);
         g = DRAW_MUL(_g, _a);
@@ -1288,7 +1288,7 @@ _dc_blend_line_argb8888(struct rtgui_dc * dst, int x1, int y1, int x2, int y2,
 {
     unsigned r, g, b, a, inva;
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(_r, _a);
         g = DRAW_MUL(_g, _a);
@@ -1819,7 +1819,7 @@ rtgui_dc_blend_fill_rects(struct rtgui_dc * dst, const rtgui_rect_t *rects, int 
     b = RTGUI_RGB_B(color);
     a = RTGUI_RGB_A(color);
 
-    if (blendMode == RTGUI_BLENDMODE_BLEND || blendMode == RTGUI_BLENDMODE_ADD)
+    if (blendMode == RTGUI_BLENDMODE_ADD || blendMode == RTGUI_BLENDMODE_MOD)
     {
         r = DRAW_MUL(r, a);
         g = DRAW_MUL(g, a);
@@ -2544,7 +2544,7 @@ void _murphyWideline(_MurphyIterator *m, rt_int16_t x1, rt_int16_t y1, rt_int16_
     float offset = (float)width / 2.f;
 
     rt_int16_t temp;
-    rt_int16_t ptx, pty, ml1x, ml1y, ml2x, ml2y, ml1bx, ml1by, ml2bx, ml2by;
+    rt_int16_t ptx, pty, ml1x = 0, ml1y = 0, ml2x = 0, ml2y = 0, ml1bx = 0, ml1by = 0, ml2bx = 0, ml2by = 0;
 
     int d0, d1;     /* difference terms d0=perpendicular to line, d1=along line */
 
