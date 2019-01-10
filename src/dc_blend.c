@@ -2544,7 +2544,7 @@ void _murphyWideline(_MurphyIterator *m, rt_int16_t x1, rt_int16_t y1, rt_int16_
     float offset = (float)width / 2.f;
 
     rt_int16_t temp;
-    rt_int16_t ptx, pty, ml1x, ml1y, ml2x, ml2y, ml1bx, ml1by, ml2bx, ml2by;
+    rt_int16_t ptx, pty, ml1x = 0, ml1y = 0, ml2x = 0, ml2y = 0, ml1bx = 0, ml1by = 0, ml2bx = 0, ml2by = 0;
 
     int d0, d1;     /* difference terms d0=perpendicular to line, d1=along line */
 
