@@ -87,6 +87,7 @@ struct rtgui_dc *rtgui_dc_buffer_create_pixformat(rt_uint8_t pixel_format, int w
         dc->gc.background = default_background;
         dc->gc.font = rtgui_font_default();
         dc->gc.textalign = RTGUI_ALIGN_LEFT | RTGUI_ALIGN_TOP;
+        dc->gc.textstyle = RTGUI_TEXTSTYLE_NORMAL;
         dc->pixel_format = pixel_format;
         dc->pixel_alpha = 255;
 
