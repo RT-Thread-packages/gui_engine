@@ -583,7 +583,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
 
     if ((dc->type == RTGUI_DC_CLIENT) || (dc->type == RTGUI_DC_HW && hw_driver->framebuffer == RT_NULL))
     {
-        int dx, dy, start_x;
+        int dx, dy, start_x, start_y;
         rtgui_rect_t r;
         rtgui_color_t *pixel;
         rt_uint8_t alpha;
@@ -605,21 +605,18 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
         }
 
         start_x = x;
-        for (; y < rect->y1 + h; ++y)
+        start_y = y;
+        for (; y < start_y + h; ++y)
         {
-            for (x = start_x; x < rect->x1 + w; ++x)
+            for (x = start_x; x < start_x + w; ++x)
             {
-                if (y - rect->y1 < 0 || x - rect->x1 < 0)
-                    continue;
-
-                pixel = (rtgui_color_t*)((rt_uint8_t*)image->data + (y - rect->y1) * image->w * 4 +
-                                         (x - rect->x1) * 4);
+                pixel = (rtgui_color_t*)((rt_uint8_t*)image->data + y * image->w * 4 + x * 4);
 
                 alpha = RTGUI_RGB_A(*pixel);
                 if (alpha == 0) continue;
                 if (alpha == 0xff)
                 {
-                    rtgui_dc_draw_color_point(dc, x, y, *pixel);
+                    rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, *pixel);
                 }
                 else
                 {
@@ -627,26 +624,26 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
 
                     /* draw an alpha blending point */
                     if (hw_driver->framebuffer != RT_NULL)
-                        rtgui_dc_blend_point(dc, x, y, RTGUI_BLENDMODE_BLEND,
+                        rtgui_dc_blend_point(dc, x + rect->x1, y + rect->y1, RTGUI_BLENDMODE_BLEND,
                                              RTGUI_RGB_R(*pixel), RTGUI_RGB_G(*pixel), RTGUI_RGB_B(*pixel), RTGUI_RGB_A(*pixel));
                     else
                     {
-                        x = x + dx;
-                        y = y + dy;
+                        int hx = x + rect->x1 + dx;
+                        int hy = y + rect->y1 + dy;
 
                         if (dc->type == RTGUI_DC_CLIENT)
                         {
-                            if (rtgui_region_contains_point(&(owner->clip), x, y, &r) != RT_EOK)
+                            if (rtgui_region_contains_point(&(owner->clip), hx, hy, &r) != RT_EOK)
                                 continue ;
                         }
 
                         /* get background pixel */
-                        hw_driver->ops->get_pixel(&bc, x, y);
+                        hw_driver->ops->get_pixel(&bc, hx, hy);
                         /* alpha blending */
                         fc = RTGUI_RGB(blending(RTGUI_RGB_R(bc), RTGUI_RGB_R(*pixel),  alpha),
                                        blending(RTGUI_RGB_G(bc), RTGUI_RGB_G(*pixel),  alpha),
                                        blending(RTGUI_RGB_B(bc), RTGUI_RGB_B(*pixel),  alpha));
-                        hw_driver->ops->set_pixel(&fc, x, y);
+                        hw_driver->ops->set_pixel(&fc, hx, hy);
                     }
                 }
             }
