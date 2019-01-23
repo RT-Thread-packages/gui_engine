@@ -1392,7 +1392,7 @@ static void _fill_small_pie(struct rtgui_dc *dc,
     /* Midpoint circle algorithm. */
     int dk, x, y;
     /* Start X, end X, */
-    rt_int16_t sx, ex, ty, my;
+    rt_int16_t sx, ex, ty = 0, my;
     enum {ST_NONE, ST_ARC, ST_TRI} st;
 
     RT_ASSERT(0 <= start && start <= 45);
@@ -1714,7 +1714,7 @@ RTM_EXPORT(rtgui_dc_get_rect);
 
 rt_uint8_t rtgui_dc_get_pixel_format(struct rtgui_dc *dc)
 {
-    rt_uint8_t pixel_fmt;
+    rt_uint8_t pixel_fmt = 0;
 
     RT_ASSERT(dc != RT_NULL);
 
