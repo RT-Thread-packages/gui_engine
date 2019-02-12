@@ -22,8 +22,8 @@
  * 2009-10-16     Bernard      first version
  * 2012-02-25     Grissiom     rewrite topwin implementation
  */
-#include "topwin.h"
-#include "mouse.h"
+#include <rtgui/widgets/topwin.h>
+#include <rtgui/widgets/mouse.h>
 
 #include <rtservice.h>
 #include <rtgui/event.h>

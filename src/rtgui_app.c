@@ -29,7 +29,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/rtgui_app.h>
 #include <rtgui/widgets/window.h>
-#include <topwin.h>
+#include <rtgui/widgets/topwin.h>
 
 static void _rtgui_app_constructor(struct rtgui_app *app)
 {
