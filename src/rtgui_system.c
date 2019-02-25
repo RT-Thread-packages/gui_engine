@@ -64,7 +64,7 @@ int rtgui_system_server_init(void)
 
     return 0;
 }
-INIT_APP_EXPORT(rtgui_system_server_init);
+INIT_ENV_EXPORT(rtgui_system_server_init);
 
 /************************************************************************/
 /* RTGUI Timer                                                          */
