@@ -55,9 +55,11 @@ static rtgui_list_t _rtgui_system_image_list = {RT_NULL};
 /* initialize rtgui image system */
 void rtgui_system_image_init(void)
 {
+#ifdef GUIENGINE_USING_HDC
     /* always support HDC image */
     rtgui_image_hdc_init();
-
+#endif
+    
 #ifdef GUIENGINE_IMAGE_XPM
     rtgui_image_xpm_init();
 #endif
