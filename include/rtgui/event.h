@@ -417,6 +417,10 @@ struct rtgui_event_touch
 #define RTGUI_TOUCH_MOTION              0x03
 #define RTGUI_EVENT_TOUCH_INIT(e)       RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_TOUCH)
 
+#ifndef GUIENGINE_CMD_STRING_MAX
+#define GUIENGINE_CMD_STRING_MAX        16
+#endif
+
 struct rtgui_event_command
 {
     _RTGUI_EVENT_WIN_ELEMENTS
@@ -428,7 +432,7 @@ struct rtgui_event_command
     rt_int32_t command_id;
 
     /* command string */
-    char command_string[GUIENGINE_NAME_MAX];
+    char command_string[GUIENGINE_CMD_STRING_MAX];
 };
 #define RTGUI_EVENT_COMMAND_INIT(e) RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_COMMAND)
 
