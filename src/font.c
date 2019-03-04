@@ -156,8 +156,7 @@ struct rtgui_font *rtgui_font_refer(const char *family, rt_uint16_t height)
     rtgui_list_foreach(node, &_rtgui_font_list)
     {
         font = rtgui_list_entry(node, struct rtgui_font, list);
-        if ((rt_strncmp(font->family, family, GUIENGINE_NAME_MAX) == 0) &&
-                font->height == height)
+        if ((rt_strcasecmp(font->family, family) == 0) && font->height == height)
         {
             font->refer_count ++;
             return font;

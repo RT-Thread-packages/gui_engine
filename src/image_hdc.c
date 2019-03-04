@@ -28,6 +28,8 @@
 #include <rtgui/image_hdc.h>
 #include <rtgui/blit.h>
 
+#ifdef GUIENGINE_USING_HDC
+
 #define HDC_MAGIC_LEN       4
 
 #ifdef PKG_USING_FASTLZ
@@ -366,3 +368,4 @@ void rtgui_image_hdc_init()
     rtgui_image_register_engine(&rtgui_image_hdc_engine);
 }
 
+#endif
