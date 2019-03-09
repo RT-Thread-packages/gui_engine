@@ -31,7 +31,7 @@ static void _rtgui_object_constructor(rtgui_object_t *object)
         return;
 
     object->flag = RTGUI_OBJECT_FLAG_VALID;
-    object->id   = (rt_uint32_t)object;
+    object->id   = (rt_ubase_t)object;
 }
 
 /* Destroys the object */

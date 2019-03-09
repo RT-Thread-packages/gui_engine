@@ -129,7 +129,7 @@ struct rtgui_object
 
     enum rtgui_object_flag flag;
 
-    rt_uint32_t id;
+    rt_ubase_t id;
 };
 
 rtgui_object_t *rtgui_object_create(const rtgui_type_t *object_type);
