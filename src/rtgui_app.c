@@ -105,7 +105,7 @@ struct rtgui_app *rtgui_app_create(const char *title)
     if (srv_app == RT_NULL)
     {
         /* set user thread */
-        tid->user_data = (rt_uint32_t)app;
+        tid->user_data = (rt_ubase_t)app;
         return app;
     }
 
@@ -116,7 +116,7 @@ struct rtgui_app *rtgui_app_create(const char *title)
     if (rtgui_send_sync(srv_app, RTGUI_EVENT(&event), sizeof(event)) == RT_EOK)
     {
         /* set user thread */
-        tid->user_data = (rt_uint32_t)app;
+        tid->user_data = (rt_ubase_t)app;
         return app;
     }
 

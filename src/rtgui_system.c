@@ -663,7 +663,7 @@ RTM_EXPORT(rtgui_send_urgent);
 rt_err_t rtgui_send_sync(struct rtgui_app* app, rtgui_event_t *event, rt_size_t event_size)
 {
     rt_err_t r;
-    rt_int32_t ack_buffer, ack_status;
+    rt_base_t ack_buffer, ack_status;
     struct rt_mailbox ack_mb;
 
     RT_ASSERT(app != RT_NULL);

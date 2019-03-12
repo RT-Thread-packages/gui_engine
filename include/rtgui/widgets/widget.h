@@ -102,7 +102,7 @@ struct rtgui_widget
     rt_int32_t flag;
 
     /* hardware device context */
-    rt_uint32_t dc_type;
+    rt_ubase_t dc_type;
     const struct rtgui_dc_engine *dc_engine;
 
     /* the graphic context of widget */
