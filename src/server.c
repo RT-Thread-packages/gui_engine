@@ -190,34 +190,36 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd *event)
 
 void rtgui_server_handle_touch(struct rtgui_event_touch *event)
 {
-//  if (rtgui_touch_do_calibration(event) == RT_TRUE)
-//  {
-//      struct rtgui_event_mouse emouse;
+#if 0
+	if (rtgui_touch_do_calibration(event) == RT_TRUE)
+	{
+		struct rtgui_event_mouse emouse;
 
-//      /* convert it as a mouse event to rtgui */
-//      if (event->up_down == RTGUI_TOUCH_MOTION)
-//      {
-//          RTGUI_EVENT_MOUSE_MOTION_INIT(&emouse);
-//          emouse.x = event->x;
-//          emouse.y = event->y;
-//          emouse.button = 0;
+		/* convert it as a mouse event to rtgui */
+		if (event->up_down == RTGUI_TOUCH_MOTION)
+		{
+			RTGUI_EVENT_MOUSE_MOTION_INIT(&emouse);
+			emouse.x = event->x;
+			emouse.y = event->y;
+			emouse.button = 0;
 
-//          rtgui_server_handle_mouse_motion(&emouse);
-//      }
-//      else
-//      {
-//          RTGUI_EVENT_MOUSE_BUTTON_INIT(&emouse);
-//          emouse.x = event->x;
-//          emouse.y = event->y;
-//          emouse.button = RTGUI_MOUSE_BUTTON_LEFT;
-//          if (event->up_down == RTGUI_TOUCH_UP)
-//              emouse.button |= RTGUI_MOUSE_BUTTON_UP;
-//          else
-//              emouse.button |= RTGUI_MOUSE_BUTTON_DOWN;
+			rtgui_server_handle_mouse_motion(&emouse);
+		}
+		else
+		{
+			RTGUI_EVENT_MOUSE_BUTTON_INIT(&emouse);
+			emouse.x = event->x;
+			emouse.y = event->y;
+			emouse.button = RTGUI_MOUSE_BUTTON_LEFT;
+			if (event->up_down == RTGUI_TOUCH_UP)
+				emouse.button |= RTGUI_MOUSE_BUTTON_UP;
+			else
+				emouse.button |= RTGUI_MOUSE_BUTTON_DOWN;
 
-//          rtgui_server_handle_mouse_btn(&emouse);
-//      }
-//  }
+			rtgui_server_handle_mouse_btn(&emouse);
+		}
+	}
+#endif
 }
 
 #ifdef _WIN32_NATIVE
@@ -227,7 +229,9 @@ void rtgui_server_handle_touch(struct rtgui_event_touch *event)
 static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
         struct rtgui_event *event)
 {
+#if RTGUI_USE_CS
     RT_ASSERT(object != RT_NULL);
+#endif
     RT_ASSERT(event != RT_NULL);
 
     /* dispatch event */
@@ -235,6 +239,7 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     {
     case RTGUI_EVENT_APP_CREATE:
     case RTGUI_EVENT_APP_DESTROY:
+#if RTGUI_USE_CS
         if (rtgui_wm_application != RT_NULL)
         {
             /* forward event to wm application */
@@ -245,6 +250,7 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
             /* always ack with OK */
             rtgui_ack(event, RTGUI_STATUS_OK);
         }
+#endif
         break;
 
     /* mouse and keyboard event */
@@ -270,54 +276,82 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
 
     /* window event */
     case RTGUI_EVENT_WIN_CREATE:
-        if (rtgui_topwin_add((struct rtgui_event_win_create *)event) == RT_EOK)
-            rtgui_ack(event, RTGUI_STATUS_OK);
-        else
-            rtgui_ack(event, RTGUI_STATUS_ERROR);
+#if RTGUI_USE_CS
+		if (rtgui_topwin_add((struct rtgui_event_win_create *)event) == RT_EOK)
+			rtgui_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_add((struct rtgui_event_win_create *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_SHOW:
         if (_show_win_hook) _show_win_hook();
-        if (rtgui_topwin_show((struct rtgui_event_win *)event) == RT_EOK)
-            rtgui_ack(event, RTGUI_STATUS_OK);
-        else
-            rtgui_ack(event, RTGUI_STATUS_ERROR);
+#if RTGUI_USE_CS
+		if (rtgui_topwin_show((struct rtgui_event_win *)event) == RT_EOK)
+			rtgui_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_show((struct rtgui_event_win *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_HIDE:
+#if RTGUI_USE_CS
         if (rtgui_topwin_hide((struct rtgui_event_win *)event) == RT_EOK)
             rtgui_ack(event, RTGUI_STATUS_OK);
         else
             rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_hide((struct rtgui_event_win *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_MOVE:
+#if RTGUI_USE_CS
         if (rtgui_topwin_move((struct rtgui_event_win_move *)event) == RT_EOK)
             rtgui_ack(event, RTGUI_STATUS_OK);
         else
             rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_move((struct rtgui_event_win_move *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_MODAL_ENTER:
-        if (rtgui_topwin_modal_enter((struct rtgui_event_win_modal_enter *)event) == RT_EOK)
-            rtgui_ack(event, RTGUI_STATUS_OK);
-        else
-            rtgui_ack(event, RTGUI_STATUS_ERROR);
+#if RTGUI_USE_CS
+		if (rtgui_topwin_modal_enter((struct rtgui_event_win_modal_enter *)event) == RT_EOK)
+			rtgui_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_modal_enter((struct rtgui_event_win_modal_enter *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_ACTIVATE:
         if (_act_win_hook) _act_win_hook();
+#if RTGUI_USE_CS
         if (rtgui_topwin_activate((struct rtgui_event_win_activate *)event) == RT_EOK)
             rtgui_ack(event, RTGUI_STATUS_OK);
         else
             rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_activate((struct rtgui_event_win_activate *)event);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_DESTROY:
+#if RTGUI_USE_CS
         if (rtgui_topwin_remove(((struct rtgui_event_win *)event)->wid) == RT_EOK)
             rtgui_ack(event, RTGUI_STATUS_OK);
         else
             rtgui_ack(event, RTGUI_STATUS_ERROR);
+#else
+		rtgui_topwin_remove(((struct rtgui_event_win *)event)->wid);
+#endif
         break;
 
     case RTGUI_EVENT_WIN_RESIZE:
@@ -326,6 +360,7 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
         break;
 
     case RTGUI_EVENT_SET_WM:
+#if RTGUI_USE_CS
         if (rtgui_wm_application != RT_NULL)
         {
             rtgui_ack(event, RTGUI_STATUS_ERROR);
@@ -338,6 +373,7 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
             rtgui_wm_application = set_wm->app;
             rtgui_ack(event, RTGUI_STATUS_OK);
         }
+#endif
         break;
 
     /* other event */
@@ -373,6 +409,7 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     return RT_TRUE;
 }
 
+#if RTGUI_USE_CS
 /**
  * rtgui server thread's entry
  */
@@ -405,9 +442,11 @@ static void rtgui_server_entry(void *parameter)
     rtgui_app_destroy(rtgui_server_app);
     rtgui_server_app = RT_NULL;
 }
+#endif
 
 rt_err_t rtgui_server_post_event(struct rtgui_event *event, rt_size_t size)
 {
+#if RTGUI_USE_CS
     rt_err_t result;
 
     if (rtgui_server_app != RT_NULL)
@@ -421,27 +460,41 @@ rt_err_t rtgui_server_post_event(struct rtgui_event *event, rt_size_t size)
     }
 
     return result;
+#else
+	return rtgui_server_event_handler(RT_NULL, event);
+#endif
 }
 
 rt_err_t rtgui_server_post_event_sync(struct rtgui_event *event, rt_size_t size)
 {
-    if (rtgui_server_app != RT_NULL)
-        return rtgui_send_sync(rtgui_server_app, event, size);
+#if RTGUI_USE_CS
+	if (rtgui_server_app != RT_NULL)
+	{
+		return rtgui_send_sync(rtgui_server_app, event, size);
+	}
     else
     {
         rt_kprintf("post when server is not running\n");
         return -RT_ENOSYS;
-    }
+#else
+	rtgui_server_event_handler(RT_NULL, event);
+	return RT_EOK;
+#endif
 }
 
 struct rtgui_app* rtgui_get_server(void)
 {
+#if RTGUI_USE_CS
     return rtgui_server_app;
+#else
+	return RT_NULL;
+#endif
 }
 RTM_EXPORT(rtgui_get_server);
 
 void rtgui_server_init(void)
 {
+#if RTGUI_USE_CS
     rt_thread_t tid;
 
     tid = rt_thread_create("rtgui",
@@ -453,5 +506,7 @@ void rtgui_server_init(void)
     /* start rtgui server thread */
     if (tid != RT_NULL)
         rt_thread_startup(tid);
+#else
+	rtgui_mouse_init();
+#endif
 }
-

@@ -44,11 +44,16 @@ extern struct rtgui_font rtgui_font_asc16;
 extern struct rtgui_font rtgui_font_asc12;
 
 static rtgui_rect_t _mainwin_rect;
+
+#if RTGUI_USE_CS
 static struct rt_mutex _screen_lock;
+#endif
 
 int rtgui_system_server_init(void)
 {
+#if RTGUI_USE_CS
     rt_mutex_init(&_screen_lock, "screen", RT_IPC_FLAG_FIFO);
+#endif
 
     /* init image */
     rtgui_system_image_init();
@@ -642,6 +647,7 @@ rt_err_t rtgui_send(struct rtgui_app* app, rtgui_event_t *event, rt_size_t event
 }
 RTM_EXPORT(rtgui_send);
 
+#if RTGUI_USE_CS
 rt_err_t rtgui_send_urgent(struct rtgui_app* app, rtgui_event_t *event, rt_size_t event_size)
 {
     rt_err_t result;
@@ -659,7 +665,9 @@ rt_err_t rtgui_send_urgent(struct rtgui_app* app, rtgui_event_t *event, rt_size_
     return result;
 }
 RTM_EXPORT(rtgui_send_urgent);
+#endif
 
+#if RTGUI_USE_CS
 rt_err_t rtgui_send_sync(struct rtgui_app* app, rtgui_event_t *event, rt_size_t event_size)
 {
     rt_err_t r;
@@ -711,6 +719,7 @@ rt_err_t rtgui_ack(rtgui_event_t *event, rt_int32_t status)
     return RT_EOK;
 }
 RTM_EXPORT(rtgui_ack);
+#endif
 
 rt_err_t rtgui_recv(rtgui_event_t *event, rt_size_t event_size, rt_int32_t timeout)
 {
@@ -729,6 +738,7 @@ rt_err_t rtgui_recv(rtgui_event_t *event, rt_size_t event_size, rt_int32_t timeo
 }
 RTM_EXPORT(rtgui_recv);
 
+#if RTGUI_USE_CS
 rt_err_t rtgui_recv_filter(rt_uint32_t type, rtgui_event_t *event, rt_size_t event_size)
 {
     rtgui_event_t *e;
@@ -761,6 +771,7 @@ rt_err_t rtgui_recv_filter(rt_uint32_t type, rtgui_event_t *event, rt_size_t eve
     return -RT_ERROR;
 }
 RTM_EXPORT(rtgui_recv_filter);
+#endif
 
 void rtgui_set_mainwin_rect(struct rtgui_rect *rect)
 {
@@ -782,18 +793,23 @@ RTM_EXPORT(rtgui_get_screen_rect);
 
 void rtgui_screen_lock(rt_int32_t timeout)
 {
+#if RTGUI_USE_CS
     rt_mutex_take(&_screen_lock, timeout);
+#endif
 }
 RTM_EXPORT(rtgui_screen_lock);
 
 void rtgui_screen_unlock(void)
 {
+#if RTGUI_USE_CS
     rt_mutex_release(&_screen_lock);
+#endif
 }
 RTM_EXPORT(rtgui_screen_unlock);
 
 int rtgui_screen_lock_freeze(void)
 {
+#if RTGUI_USE_CS
     int hold = 0;
 
     if (_screen_lock.owner == rt_thread_self())
@@ -804,13 +820,17 @@ int rtgui_screen_lock_freeze(void)
         while (index --) rt_mutex_release(&_screen_lock);
     }
 
-    return hold;
+	return hold;
+#else
+	return 0;
+#endif
 }
 RTM_EXPORT(rtgui_screen_lock_freeze);
 
 void rtgui_screen_lock_thaw(int value)
 {
+#if RTGUI_USE_CS
     while (value--) rt_mutex_take(&_screen_lock, RT_WAITING_FOREVER);
+#endif
 }
 RTM_EXPORT(rtgui_screen_lock_thaw);
-

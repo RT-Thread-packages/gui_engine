@@ -63,7 +63,6 @@
 #define IS_ROOT_WIN(topwin) ((topwin)->parent == RT_NULL)
 
 static rt_list_t _rtgui_topwin_list = RT_LIST_OBJECT_INIT(_rtgui_topwin_list);
-static struct rt_semaphore _rtgui_topwin_lock;
 
 static void rtgui_topwin_update_clip(void);
 static void rtgui_topwin_redraw(struct rtgui_rect *rect);
@@ -71,8 +70,6 @@ static void _rtgui_topwin_activate_next(enum rtgui_topwin_flag);
 
 void rtgui_topwin_init(void)
 {
-    /* initialize semaphore */
-    rt_sem_init(&_rtgui_topwin_lock, "wintree", 1, RT_IPC_FLAG_FIFO);
 }
 
 static struct rtgui_topwin *rtgui_topwin_search_in_list(struct rtgui_win *window,
@@ -385,7 +382,12 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
     topwin->flag |= WINTITLE_ACTIVATE;
 
     event.wid = topwin->wid;
-    rtgui_send(topwin->app, &(event.parent), sizeof(struct rtgui_event_win));
+    
+#if RTGUI_USE_CS
+	rtgui_send(topwin->app, &(event.parent), sizeof(struct rtgui_event_win));
+#else
+	topwin->app->parent.event_handler(&topwin->app->parent, &event.parent);
+#endif
 }
 
 /* activate next window in the same layer as flag. The flag has many other
@@ -537,7 +539,11 @@ static void _rtgui_topwin_draw_tree(struct rtgui_topwin *topwin, struct rtgui_ev
     }
 
     epaint->wid = topwin->wid;
-    rtgui_send(topwin->app, &(epaint->parent), sizeof(*epaint));
+#if RTGUI_USE_CS
+	rtgui_send(topwin->app, &(epaint->parent), sizeof(*epaint));
+#else
+	topwin->app->parent.event_handler(&topwin->app->parent, &epaint->parent);
+#endif
 }
 
 rt_err_t rtgui_topwin_activate_topwin(struct rtgui_topwin *topwin)
@@ -956,7 +962,12 @@ static void rtgui_topwin_update_clip(void)
 
         /* send clip event to destination window */
         eclip.wid = top->wid;
+
+#if RTGUI_USE_CS
         rtgui_send(top->app, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
+#else
+		top->app->parent.event_handler(&top->app->parent, &eclip.parent);
+#endif
 
         top = _rtgui_topwin_get_next_shown(top);
     }

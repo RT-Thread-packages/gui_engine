@@ -113,7 +113,9 @@ struct rtgui_app *rtgui_app_create(const char *title)
     event.app = app;
 
     /* notify rtgui server to one application has been created */
-    if (rtgui_send_sync(srv_app, RTGUI_EVENT(&event), sizeof(event)) == RT_EOK)
+#if RTGUI_USE_CS
+	if (rtgui_send_sync(srv_app, RTGUI_EVENT(&event), sizeof(event)) == RT_EOK)
+#endif
     {
         /* set user thread */
         tid->user_data = (rt_ubase_t)app;
@@ -147,6 +149,7 @@ void rtgui_app_destroy(struct rtgui_app *app)
         return;
     }
 
+#if RTGUI_USE_CS
     /* send a message to notify rtgui server */
     srv_app = rtgui_get_server();
     if (srv_app != rtgui_app_self())
@@ -161,6 +164,7 @@ void rtgui_app_destroy(struct rtgui_app *app)
             return ;
         }
     }
+#endif
 
     app->tid->user_data = 0;
     rt_mq_delete(app->mq);
@@ -506,6 +510,7 @@ void rtgui_app_close(struct rtgui_app *app)
 }
 RTM_EXPORT(rtgui_app_close);
 
+#if RTGUI_USE_CS
 /**
  * set this application as window manager
  */
@@ -530,6 +535,7 @@ rt_err_t rtgui_app_set_as_wm(struct rtgui_app *app)
     return RT_ERROR;
 }
 RTM_EXPORT(rtgui_app_set_as_wm);
+#endif
 
 void rtgui_app_set_main_win(struct rtgui_app *app, struct rtgui_win *win)
 {
@@ -556,4 +562,3 @@ unsigned int rtgui_app_get_win_acti_cnt(void)
     return 0;
 }
 RTM_EXPORT(rtgui_app_get_win_acti_cnt);
-
