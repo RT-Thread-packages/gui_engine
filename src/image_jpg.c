@@ -810,7 +810,7 @@ static rt_bool_t rtgui_image_jpeg_load(struct rtgui_image *image, struct rtgui_f
         if (jpeg->is_loaded == RT_TRUE)
         {
             rt_uint8_t *pixels = RT_NULL;
-            
+
             if (jpeg->tjpgd.format == 0 && PKG_USING_RGB888_PIXEL_BITS == 32)
                 pixels = (rt_uint8_t *)rtgui_malloc(4 * image->w * image->h);
 
@@ -929,7 +929,8 @@ static void rtgui_image_jpeg_blit(struct rtgui_image *image,
     if (jpeg->pixels)
     {
         if ((rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB888 && jpeg->tjpgd.format == 0) ||
-                (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB565 && jpeg->tjpgd.format == 1))
+                (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_RGB565 && jpeg->tjpgd.format == 1) ||
+                (rtgui_dc_get_pixel_format(dc) == RTGRAPHIC_PIXEL_FORMAT_ARGB888 && jpeg->tjpgd.format == 0))
         {
             rt_uint16_t imageWidth = image->w * jpeg->byte_per_pixel;
             rt_uint8_t *src = jpeg->pixels + yoff * imageWidth + xoff * jpeg->byte_per_pixel;

@@ -52,6 +52,10 @@
 #define PINFO(...)
 #endif
 
+#ifndef RT_DFS_ELM_MAX_LFN
+#define RT_DFS_ELM_MAX_LFN 255
+#endif
+
 #define _dc_get_pixel(dc, x, y)	\
     ((dc)->pixel + (y) * (dc)->pitch + (x) * rtgui_color_get_bpp((dc)->pixel_format))
 

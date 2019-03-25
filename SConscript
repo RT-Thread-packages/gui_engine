@@ -1,19 +1,33 @@
-# RT-Thread building script for bridge
+# RT-Thread building script for GuiEngine
 
 import os
+import rtconfig
 from building import *
 
 cwd = GetCurrentDir()
-src = []
-CPPPATH = [ cwd + '/include']
 
-objs = DefineGroup('GuiEngine', src, depend = ['PKG_USING_GUIENGINE'], CPPPATH = CPPPATH)
-list = os.listdir(cwd)
+src = Glob('src/*.c')
+CPPPATH = [cwd + '/include']
 
-if GetDepend('PKG_USING_GUIENGINE'):
-    for d in list:
-        path = os.path.join(cwd, d)
-        if os.path.isfile(os.path.join(path, 'SConscript')):
-            objs = objs + SConscript(os.path.join(d, 'SConscript'))
+if GetDepend('GUIENGINE_IMAGE_TJPGD'):
+    src += Glob('libraries/tjpgd1a/*.c')
+    CPPPATH += [cwd + '/libraries/tjpgd1a']
 
-Return('objs')
+if GetDepend('GUIENGINE_IMAGE_LODEPNG'):
+    if rtconfig.ARCH == 'sim':
+            src += Glob('libraries/lodepng/*.c')
+            CPPPATH += [cwd + '/libraries/lodepng']
+    else:
+        if GetDepend('RT_USING_LIBC'):
+            src += Glob('libraries/lodepng/*.c')
+            CPPPATH += [cwd + '/libraries/lodepng']
+
+group = DefineGroup('GuiEngine', src, depend = ['PKG_USING_GUIENGINE'], CPPPATH = CPPPATH)
+
+if GetDepend('GUIENGINE_USING_DEMO'):
+    group = group + SConscript(os.path.join('example', 'SConscript'))
+
+if GetDepend('GUIENGINE_USING_TTF'):
+    group = group + SConscript(os.path.join('libraries/freetype-2.6.2', 'SConscript'))
+
+Return('group')

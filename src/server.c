@@ -32,8 +32,8 @@
 
 #include <rtgui/widgets/window.h>
 
-#include "mouse.h"
-#include "topwin.h"
+#include <rtgui/widgets/mouse.h>
+#include <rtgui/widgets/topwin.h>
 
 static struct rtgui_app *rtgui_server_app = RT_NULL;
 static struct rtgui_app *rtgui_wm_application = RT_NULL;

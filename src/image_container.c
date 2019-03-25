@@ -121,7 +121,7 @@ rt_inline unsigned int primes_closest(unsigned int num)
 /* directly hash */
 unsigned int direct_hash(const void *v)
 {
-    return (unsigned int)v;
+    return (unsigned int)(((rt_ubase_t)v) & 0xFFFFFFFF);
 }
 
 rtgui_hash_table_t *hash_table_create(rtgui_hash_func_t hash_func, rtgui_equal_func_t key_equal_func)

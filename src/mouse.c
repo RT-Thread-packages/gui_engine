@@ -22,7 +22,7 @@
  * 2009-10-16     Bernard      first version
  */
 
-#include "mouse.h"
+#include <rtgui/widgets/mouse.h>
 #include <rtgui/region.h>
 #include <rtgui/driver.h>
 #include <rtgui/rtgui_system.h>

@@ -5,18 +5,50 @@ from building import *
 
 cwd = GetCurrentDir()
 list = os.listdir(cwd)
-GroupPath = cwd
 CPPDEFINES = ['FT2_BUILD_LIBRARY']
 
-src = []
-group = []
+src = Split('''
+src/autofit/autofit.c
+src/base/fttype1.c
+src/base/ftbitmap.c
+src/base/ftbase.c
+src/base/ftbbox.c
+src/base/ftfstype.c
+src/base/ftglyph.c
+src/base/ftinit.c
+src/base/ftlcdfil.c
+src/base/ftmm.c
+src/base/ftpatent.c
+src/cache/ftcbasic.c
+src/cache/ftccache.c
+src/cache/ftccmap.c
+src/cache/ftcglyph.c
+src/cache/ftcimage.c
+src/cache/ftcmanag.c
+src/cache/ftcmru.c
+src/cache/ftcsbits.c
+src/psnames/psnames.c
+src/sfnt/sfnt.c
+src/smooth/smooth.c
+src/truetype/truetype.c
+builds/rt-thread/ftsystem.c
+builds/rt-thread/gb2312tounicode.c
+''')
 
-group = DefineGroup('freetype', src, depend = ['GUIENGINE_USING_TTF'], CPPDEFINES=CPPDEFINES, GroupPath = GroupPath)
+CPPPATH = [cwd]
+CPPPATH += ['/src/autofit']
+CPPPATH += [cwd + '/src/base']
+CPPPATH += [cwd + '/src/cache']
+CPPPATH += [cwd + '/src/psnames']
+CPPPATH += [cwd + '/src/sfnt']
+CPPPATH += [cwd + '/src/smooth']
+CPPPATH += [cwd + '/src/truetype']
+CPPPATH += [cwd + '/include']
+CPPPATH += [cwd + '/include/freetype']
+CPPPATH += [cwd + '/include/freetype/config']
+CPPPATH += [cwd + '/include/freetype/internal']
+CPPPATH += [cwd + '/include/freetype/internal/services']
 
-if GetDepend('GUIENGINE_USING_TTF'):
-    for d in list:
-        path = os.path.join(cwd, d)
-        if os.path.isfile(os.path.join(path, 'SConscript')):
-            group = group + SConscript(os.path.join(d, 'SConscript'))
+group = DefineGroup('FreeType', src, depend = ['GUIENGINE_USING_TTF'], CPPDEFINES = CPPDEFINES, CPPPATH = CPPPATH)
 
 Return('group')

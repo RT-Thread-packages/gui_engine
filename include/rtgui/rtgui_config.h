@@ -67,6 +67,13 @@
 
 #define GUIENGIN_USING_VFRAMEBUFFER
 
+#ifndef PKG_USING_RGB888_PIXEL_BITS_32
+#ifndef PKG_USING_RGB888_PIXEL_BITS_24
+#define PKG_USING_RGB888_PIXEL_BITS_32
+#define PKG_USING_RGB888_PIXEL_BITS 32
+#endif
+#endif
+
 #ifdef DEBUG_MEMLEAK
 #define rtgui_malloc     rt_malloc
 #define rtgui_realloc    rt_realloc
