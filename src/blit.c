@@ -1457,6 +1457,185 @@ static void BlitAlphatoARGB888PixelAlpha(struct rtgui_blit_info *info)
     }
 }
 
+/* alpha color -> RGB565 blending with alpha */
+static void BlitAlphaColortoRGB565PixelAlpha(struct rtgui_blit_info * info)
+{
+    rt_uint32_t srcR, srcG, srcB, srcA;
+    rt_uint32_t height = info->dst_h;
+    rt_uint16_t *dst = (rt_uint16_t *)info->dst;
+    rt_uint32_t dst_skip = info->dst_skip >> 1;
+
+    srcA = info->a;
+    srcR = info->r;
+    srcG = info->g;
+    srcB = info->b;
+
+    while (height--)
+    {
+        rt_uint32_t width = info->dst_w;
+        while (width--)
+        {
+            /* not do alpha blend */
+            if ((srcA >> 3) == (0xFFU >> 3))
+            {
+                RGB565_FROM_RGB(*dst, srcR, srcG, srcB);
+            }
+            else if ((srcA >> 3) == 0)
+            {
+                /* keep original pixel data */
+            }
+            else
+            {
+                rt_uint32_t dstR, dstG, dstB;
+                rt_uint32_t inverse_alpha = 255 - srcA;
+
+                RGB_FROM_RGB565(*dst, dstR, dstG, dstB);
+
+                dstR = ((srcR * srcA) + (inverse_alpha * dstR)) >> 8;
+                dstG = ((srcG * srcA) + (inverse_alpha * dstG)) >> 8;
+                dstB = ((srcB * srcA) + (inverse_alpha * dstB)) >> 8;
+
+                RGB565_FROM_RGB(*dst, dstR, dstG, dstB);
+            }
+            dst++;
+        }
+        dst += dst_skip;
+    }
+}
+
+/* alpha color -> RGB888 blending with alpha */
+static void BlitAlphaColortoRGB888PixelAlpha(struct rtgui_blit_info *info)
+{
+    rt_uint32_t srcR, srcG, srcB, srcA;
+    rt_uint32_t height = info->dst_h;
+#ifdef PKG_USING_RGB888_PIXEL_BITS_32
+    rt_uint32_t *dst = (rt_uint32_t *)info->dst;
+    rt_uint32_t dst_skip = info->dst_skip >> 2;
+#else
+    rt_uint8_t *dst = (rt_uint8_t *)info->dst;
+    rt_uint32_t dst_skip = info->dst_skip;
+#endif
+
+    srcA = info->a;
+    srcR = info->r;
+    srcG = info->g;
+    srcB = info->b;
+
+    while (height--)
+    {
+        int width = info->dst_w;
+        while (width--)
+        {
+            /* not do alpha blend */
+            if ((srcA >> 3) == (0xFFU >> 3))
+            {
+                if (PKG_USING_RGB888_PIXEL_BITS == 32)
+                {
+                    RGB888_FROM_RGB(*dst, srcR, srcG, srcB);
+                    dst++;
+                }
+                else
+                {
+                    *dst++ = srcR;
+                    *dst++ = srcG;
+                    *dst++ = srcB;
+                }
+            }
+            else if ((srcA >> 3) == 0)
+            {
+                /* keep original pixel data */
+            }
+            else
+            {
+                rt_uint32_t dstR, dstG, dstB;
+                rt_uint32_t inverse_alpha = 255 - srcA;
+
+                if (PKG_USING_RGB888_PIXEL_BITS == 32)
+                {
+                    RGB_FROM_RGB888(*dst, dstR, dstG, dstB);
+                }
+                else
+                {
+                    dstR = *dst;
+                    dstG = *(dst + 1);
+                    dstB = *(dst + 2);
+                }
+
+                dstR = ((srcR * srcA) + (inverse_alpha * dstR)) >> 8;
+                dstG = ((srcG * srcA) + (inverse_alpha * dstG)) >> 8;
+                dstB = ((srcB * srcA) + (inverse_alpha * dstB)) >> 8;
+
+                if (PKG_USING_RGB888_PIXEL_BITS == 32)
+                {
+                    RGB888_FROM_RGB(*dst, dstR, dstG, dstB);
+                    dst++;
+                }
+                else
+                {
+                    *dst++ = dstR;
+                    *dst++ = dstG;
+                    *dst++ = dstB;
+                }
+            }
+        }
+
+        dst += dst_skip;
+    }
+}
+
+/* alpha color -> ARGB888 blending with alpha */
+static void BlitAlphaColortoARGB888PixelAlpha(struct rtgui_blit_info *info)
+{
+    rt_uint32_t srcR, srcG, srcB, srcA;
+    rt_uint32_t height = info->dst_h;
+    rt_uint32_t *dst = (rt_uint32_t *)info->dst;
+    rt_uint32_t dst_skip = info->dst_skip >> 2;
+
+    srcA = info->a;
+    srcR = info->r;
+    srcG = info->g;
+    srcB = info->b;
+
+    while (height--)
+    {
+        rt_uint32_t width = info->dst_w;
+        while (width--)
+        {
+            /* not do alpha blend */
+            if ((srcA >> 3) == (0xFFU >> 3))
+            {
+                ARGB8888_FROM_RGBA(*dst, srcR, srcG, srcB, 0xFFU);
+            }
+            else if ((srcA >> 3) == 0)
+            {
+                /* keep original pixel data */
+            }
+            else
+            {
+                rt_uint32_t dstR, dstG, dstB, dstA;
+                rt_uint32_t inverse_alpha = 0xFFU - srcA;
+
+                RGBA_FROM_ARGB8888(*dst, dstR, dstG, dstB, dstA);
+                if (dstA)
+                {
+                    dstR = ((srcR * srcA) + (inverse_alpha * dstR)) >> 8;
+                    dstG = ((srcG * srcA) + (inverse_alpha * dstG)) >> 8;
+                    dstB = ((srcB * srcA) + (inverse_alpha * dstB)) >> 8;
+                    dstA = srcA + ((0xFFU - srcA) * dstA) / 0xFFU;
+
+                    ARGB8888_FROM_RGBA(*dst, dstR, dstG, dstB, dstA);
+                }
+                else
+                {
+                    ARGB8888_FROM_RGBA(*dst, srcR, srcG, srcB, srcA);
+                }
+            }
+            dst++;
+        }
+        dst += dst_skip;
+    }
+}
+
 void rtgui_blit(struct rtgui_blit_info *info)
 {
     if (info->src_h == 0 ||
@@ -1539,6 +1718,21 @@ void rtgui_blit(struct rtgui_blit_info *info)
             break;
         case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
             BlitAlphatoARGB888PixelAlpha(info);
+            break;
+        }
+    }
+    else if (info->src_fmt == RTGRAPHIC_PIXEL_FORMAT_COLOR)
+    {
+        switch (info->dst_fmt)
+        {
+        case RTGRAPHIC_PIXEL_FORMAT_RGB565:
+            BlitAlphaColortoRGB565PixelAlpha(info);
+            break;
+        case RTGRAPHIC_PIXEL_FORMAT_RGB888:
+            BlitAlphaColortoRGB888PixelAlpha(info);
+            break;
+        case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
+            BlitAlphaColortoARGB888PixelAlpha(info);
             break;
         }
     }

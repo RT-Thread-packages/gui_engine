@@ -684,7 +684,7 @@ static void rtgui_dc_buffer_blit_line(struct rtgui_dc *self, int x1, int x2, int
     if (x1 < 0)
         x1 = 0;
     if (x2 >= dc->width)
-        x2 = dc->width-1;
+        x2 = dc->width;
 
     pixel = _dc_get_pixel(dc,x1,y);
     memcpy(pixel, line_data, (x2 - x1) * rtgui_color_get_bpp(dc->pixel_format));
