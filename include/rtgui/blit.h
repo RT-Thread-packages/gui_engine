@@ -49,6 +49,10 @@
 #include <rtgui/rtgui.h>
 #include <rtgui/dc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Assemble R-G-B values into a specified pixel format and store them */
 #define RGB565_FROM_RGB(Pixel, r, g, b)                                 \
 {                                                                       \
@@ -242,6 +246,10 @@ rtgui_blit_line_func rtgui_blit_line_get_inv(int dst_bpp, int src_bpp);
 
 void rtgui_blit(struct rtgui_blit_info * info);
 void rtgui_image_info_blit(struct rtgui_image_info* image, struct rtgui_dc* dc, struct rtgui_rect *dc_rect);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
