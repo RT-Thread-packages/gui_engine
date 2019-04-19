@@ -245,10 +245,21 @@ void rtgui_graphic_driver_screen_update(const struct rtgui_graphic_driver *drive
     {
         struct rt_device_rect_info rect_info;
 
-        rect_info.x = rect->x1;
-        rect_info.y = rect->y1;
-        rect_info.width = rect->x2 - rect->x1;
-        rect_info.height = rect->y2 - rect->y1;
+        if (rect->x1 >= driver->width || rect->y1 >= driver->height)
+            return;
+        
+        if (rect->x2 <= 0 || rect->y2 <= 0)
+            return;
+    
+        rect_info.x = rect->x1 > 0 ? rect->x1 : 0;
+        rect_info.y = rect->y1 > 0 ? rect->y1 : 0;
+        
+        rect_info.width = rect->x2 > driver->width ? driver->width : rect->x2;
+        rect_info.height = rect->y2 > driver->height ? driver->height : rect->y2;
+        
+        rect_info.width -= rect_info.x;
+        rect_info.height -= rect_info.y;
+
         rt_device_control(driver->device, RTGRAPHIC_CTRL_RECT_UPDATE, &rect_info);
     }
 }
