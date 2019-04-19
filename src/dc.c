@@ -1949,11 +1949,14 @@ void rtgui_dc_end_drawing(struct rtgui_dc *dc, rt_bool_t update)
             else
             {
                 /* send to server for window update */
-                struct rtgui_event_update_end eupdate;
-                RTGUI_EVENT_UPDATE_END_INIT(&(eupdate));
-                eupdate.rect = owner->extent;
+                //struct rtgui_event_update_end eupdate;
+                //RTGUI_EVENT_UPDATE_END_INIT(&(eupdate));
+                //eupdate.rect = owner->extent;
 
-                rtgui_server_post_event((struct rtgui_event *)&eupdate, sizeof(eupdate));
+                //rtgui_server_post_event((struct rtgui_event *)&eupdate, sizeof(eupdate));
+
+                /* update screen */
+                rtgui_graphic_driver_screen_update(rtgui_graphic_driver_get_default(), &(owner->extent));
             }
         }
     }

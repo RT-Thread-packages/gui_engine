@@ -203,43 +203,13 @@ struct rtgui_font *rtgui_fnt_font_create(const char* filename, const char* font_
     /* load font */
     {
         struct rtgui_font_bitmap *asc = (struct rtgui_font_bitmap*)rtgui_malloc(sizeof(struct rtgui_font_bitmap));
-        struct rtgui_hz_file_font *hz = (struct rtgui_hz_file_font*)rtgui_malloc(sizeof(struct rtgui_hz_file_font));
+        struct rtgui_hz_file_font *hz = NULL;
         struct rtgui_font *asc_font = (struct rtgui_font*)rtgui_malloc(sizeof(struct rtgui_font));
-        struct rtgui_font *hz_font = (struct rtgui_font*)rtgui_malloc(sizeof(struct rtgui_font));
+        struct rtgui_font *hz_font = NULL;
 
-        /* load asc */
-        if (asc && asc_font)
-        {
-            asc->bmp = (const rt_uint8_t *)rtgui_malloc(fnt_header->asc_length);
-            if (asc->bmp)
-            {
-                asc->char_width = RT_NULL;
-                asc->offset = RT_NULL;
-                asc->width = fnt_header->w / 2;
-                asc->height = fnt_header->h;
-                asc->first_char = 0x00;
-                asc->last_char = 0xFF;
-
-                lseek(fd, fnt_header->asc_offset, SEEK_SET);
-                if (read(fd, (void*)asc->bmp, fnt_header->asc_length) != fnt_header->asc_length)
-                {
-                    rtgui_free((void*)asc->bmp);
-                    rtgui_free(asc);
-                    rtgui_free(asc_font);
-                }
-                else
-                {
-                    asc_font->family = rt_strdup("asc");
-                    asc_font->height = fnt_header->h;
-                    asc_font->refer_count = 1;
-                    asc_font->engine = &bmp_font_engine;
-                    asc_font->data = (void *)asc;
-
-                    rtgui_font_system_add_font(asc_font);
-                }
-            }
-        }
 #ifdef GUIENGINE_USING_HZ_FILE
+        hz = (struct rtgui_hz_file_font*)rtgui_malloc(sizeof(struct rtgui_hz_file_font));
+        hz_font = (struct rtgui_font*)rtgui_malloc(sizeof(struct rtgui_font));
         /* load hz */
         if (hz && hz_font && fnt_header->asc_offset != 0)
         {
@@ -265,6 +235,43 @@ struct rtgui_font *rtgui_fnt_font_create(const char* filename, const char* font_
             hz_font = RT_NULL;
         }
 #endif
+
+        /* load asc */
+        if (asc && asc_font)
+        {
+            asc->bmp = (const rt_uint8_t *)rtgui_malloc(fnt_header->asc_length);
+            if (asc->bmp)
+            {
+                asc->char_width = RT_NULL;
+                asc->offset = RT_NULL;
+                asc->width = fnt_header->w / 2;
+                asc->height = fnt_header->h;
+                asc->first_char = 0x00;
+                asc->last_char = 0xFF;
+
+                lseek(fd, fnt_header->asc_offset, SEEK_SET);
+                if (read(fd, (void*)asc->bmp, fnt_header->asc_length) != fnt_header->asc_length)
+                {
+                    rtgui_free((void*)asc->bmp);
+                    rtgui_free(asc);
+                    rtgui_free(asc_font);
+                }
+                else
+                {
+                    if (hz_font)
+                        asc_font->family = rt_strdup("asc");
+                    else
+                        asc_font->family = rt_strdup(font_family);
+                    asc_font->height = fnt_header->h;
+                    asc_font->refer_count = 1;
+                    asc_font->engine = &bmp_font_engine;
+                    asc_font->data = (void *)asc;
+
+                    rtgui_font_system_add_font(asc_font);
+                }
+            }
+        }
+
         close(fd);
 
         if (hz_font)
@@ -326,7 +333,6 @@ struct rtgui_font *rtgui_hz_fnt_font_create(const char* filename, const char* fo
             rtgui_free(hz);
             rtgui_free(hz_font);
         }
-
     }
 
     return font;
