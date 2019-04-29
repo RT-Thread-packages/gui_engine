@@ -65,12 +65,49 @@ static rt_bool_t show_demo(struct rtgui_win *win)
         rtgui_dc_draw_text(dc, text_buf, &draw_rect);
         RTGUI_DC_FC(dc) = fc;
     }
-
+    
     rtgui_dc_end_drawing(dc, RT_TRUE);
 
     return RT_TRUE;
 }
 
+static rt_bool_t touch_test(struct rtgui_win *win, rtgui_event_t *event)
+{
+    struct rtgui_dc *dc;
+    rtgui_rect_t rect;
+    struct rtgui_event_mouse *emouse = (struct rtgui_event_mouse*)event;
+
+    dc = rtgui_dc_begin_drawing(RTGUI_WIDGET(win));
+    if (dc == RT_NULL)
+    {
+        rt_kprintf("dc is null \n");
+        return RT_FALSE;
+    }
+    rtgui_dc_get_rect(dc, &rect);
+    
+    /* draw touch */
+    {
+        rtgui_color_t fc;
+        rtgui_rect_t draw_rect;
+        char text_buf[20];
+
+        sprintf(text_buf,"[%03d,%03d]",emouse->x,emouse->y);
+
+        fc = RTGUI_DC_FC(dc);
+        RTGUI_DC_FC(dc) = BLACK;
+
+        draw_rect.x1 = rect.x2 * 2 / 5;
+        draw_rect.y1 = rect.y2 * 3 / 4 + 20;
+        draw_rect.x2 = rect.x2;
+        draw_rect.y2 = rect.y2 + 20;
+        rtgui_dc_fill_rect(dc,&draw_rect);
+        rtgui_dc_draw_text(dc, text_buf, &draw_rect);
+        RTGUI_DC_FC(dc) = fc;
+    }
+    rtgui_dc_end_drawing(dc, RT_TRUE);
+
+    return RT_TRUE;
+}
 rt_bool_t dc_event_handler(struct rtgui_object *object, rtgui_event_t *event)
 {
     rt_bool_t err;
@@ -79,7 +116,10 @@ rt_bool_t dc_event_handler(struct rtgui_object *object, rtgui_event_t *event)
     err = rtgui_win_event_handler(RTGUI_OBJECT(win), event);
     if (event->type == RTGUI_EVENT_PAINT)
         show_demo(win);
-
+    if (event->type == RTGUI_EVENT_MOUSE_BUTTON || event->type == RTGUI_EVENT_MOUSE_MOTION)
+    {
+         touch_test(win,event);		
+    }
     return err;
 }
 

@@ -22,6 +22,10 @@ if GetDepend('GUIENGINE_IMAGE_LODEPNG'):
             src += Glob('libraries/lodepng/*.c')
             CPPPATH += [cwd + '/libraries/lodepng']
 
+if GetDepend('GUIENGINE_USING_TOUCH'):
+    src += [cwd + '/touch/rtgui_touch.c']
+    CPPPATH += [cwd + '/touch']
+
 group = DefineGroup('GuiEngine', src, depend = ['PKG_USING_GUIENGINE'], CPPPATH = CPPPATH)
 
 if GetDepend('GUIENGINE_USING_DEMO'):
