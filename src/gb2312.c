@@ -2318,6 +2318,9 @@ void GB2312ToUTF_8(char *pOut,char *pText, int pLen)
 //            tmp = rst[j] = buf[0];
 //            tmp = rst[j+1] = buf[1];
 //            tmp = rst[j+2] = buf[2];
+            rst[j] = buf[0];
+            rst[j+1] = buf[1];
+            rst[j+2] = buf[2];
 
             j += 3;
             i += 2;
