@@ -34,7 +34,4 @@ if GetDepend('GUIENGINE_USING_DEMO'):
 if GetDepend('GUIENGINE_USING_TTF'):
     group = group + SConscript(os.path.join('libraries/freetype-2.6.2', 'SConscript'))
 
-if GetDepend('GUIENGINE_USING_TOUCH'):
-    group = group + SConscript(os.path.join('libraries/touch', 'SConscript'))
-
 Return('group')
