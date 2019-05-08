@@ -31,3 +31,14 @@ menuconfig package path：
 
 * 配置使能示例选项 `Enable the example of Gui Engine`
 * 配置包版本选为最新版 `latest`
+
+## 4、如何支持触摸设备
+
+- 在 GUI Engine 中开启`Support touch`配置
+- 开启以下配置 并选择合适芯片
+
+```
+RT-Thread online package
+    system package
+        [*] touch drivers
+```
