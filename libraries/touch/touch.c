@@ -10,7 +10,6 @@
  */
 #include "touch.h"
 #include <string.h>
-#ifdef PKG_USING_TOUCH
 #ifdef PKG_USING_GUIENGINE
 #include <rtgui/event.h>
 #include <rtgui/rtgui_server.h>
@@ -215,6 +214,3 @@ static int touc_bg_init(void)
     return 0;
 }
 INIT_APP_EXPORT(touc_bg_init);
-
-
-#endif
