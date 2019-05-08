@@ -22,6 +22,10 @@ if GetDepend('GUIENGINE_IMAGE_LODEPNG'):
             src += Glob('libraries/lodepng/*.c')
             CPPPATH += [cwd + '/libraries/lodepng']
 
+if GetDepend('GUIENGINE_USING_TOUCH'):
+    src += Glob('libraries/touch/touch.c')
+    CPPPATH += [cwd + '/libraries/touch']
+
 group = DefineGroup('GuiEngine', src, depend = ['PKG_USING_GUIENGINE'], CPPPATH = CPPPATH)
 
 if GetDepend('GUIENGINE_USING_DEMO'):
@@ -29,5 +33,8 @@ if GetDepend('GUIENGINE_USING_DEMO'):
 
 if GetDepend('GUIENGINE_USING_TTF'):
     group = group + SConscript(os.path.join('libraries/freetype-2.6.2', 'SConscript'))
+
+if GetDepend('GUIENGINE_USING_TOUCH'):
+    group = group + SConscript(os.path.join('libraries/touch', 'SConscript'))
 
 Return('group')
