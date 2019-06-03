@@ -111,7 +111,7 @@ struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char *fn)
         if (*ext == '.')
         {
             ext ++;
-			if (*(ext - 3) == '.')
+			if (*(ext - 3) == '.')//check '9.png'
 			{
 				ext -= 2;
 			}
