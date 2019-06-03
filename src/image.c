@@ -1,4 +1,4 @@
-/*
+﻿/*
  * File      : image.c
  * This file is part of RT-Thread GUI Engine
  * COPYRIGHT (C) 2006 - 2017, RT-Thread Development Team
@@ -111,6 +111,10 @@ struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char *fn)
         if (*ext == '.')
         {
             ext ++;
+			if (*(ext - 3) == '.')
+			{
+				ext -= 2;
+			}
             break;
         }
         ext --;
