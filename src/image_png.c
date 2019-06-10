@@ -443,12 +443,12 @@ struct rtgui_image_engine rtgui_image_png_engine =
 
 struct rtgui_image_engine rtgui_image_9png_engine =
 {
-	"9.png",
-	{ RT_NULL },
-	rtgui_image_png_check,
-	rtgui_image_png_load,
-	rtgui_image_png_unload,
-	rtgui_image_png_blit,
+    "9.png",
+    { RT_NULL },
+    rtgui_image_png_check,
+    rtgui_image_png_load,
+    rtgui_image_png_unload,
+    rtgui_image_png_blit,
 };
 
 static rt_bool_t rtgui_image_png_check(struct rtgui_filerw *file)
@@ -723,6 +723,6 @@ void rtgui_image_png_init()
 {
     /* register png on image system */
     rtgui_image_register_engine(&rtgui_image_png_engine);
-	rtgui_image_register_engine(&rtgui_image_9png_engine);
+    rtgui_image_register_engine(&rtgui_image_9png_engine);
 }
 #endif
