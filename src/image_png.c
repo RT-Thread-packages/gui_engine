@@ -1,4 +1,4 @@
-/*
+﻿/*
  * File      : image_png.c
  * This file is part of RT-Thread GUI Engine
  * COPYRIGHT (C) 2006 - 2017, RT-Thread Development Team
@@ -441,6 +441,16 @@ struct rtgui_image_engine rtgui_image_png_engine =
     rtgui_image_png_blit,
 };
 
+struct rtgui_image_engine rtgui_image_9png_engine =
+{
+    "9.png",
+    { RT_NULL },
+    rtgui_image_png_check,
+    rtgui_image_png_load,
+    rtgui_image_png_unload,
+    rtgui_image_png_blit,
+};
+
 static rt_bool_t rtgui_image_png_check(struct rtgui_filerw *file)
 {
     int start;
@@ -713,5 +723,6 @@ void rtgui_image_png_init()
 {
     /* register png on image system */
     rtgui_image_register_engine(&rtgui_image_png_engine);
+    rtgui_image_register_engine(&rtgui_image_9png_engine);
 }
 #endif
