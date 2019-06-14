@@ -25,7 +25,7 @@
 #include <rtdbg.h>
 #endif
 
-static void post_down_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
+static void post_down_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t id)
 {
     struct rtgui_event_mouse emouse;
 
@@ -37,11 +37,11 @@ static void post_down_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.x = x;
     emouse.y = y;
     emouse.ts = rt_tick_get();
-    emouse.id = ts;
+    emouse.id = id;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
 }
 
-static void post_motion_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
+static void post_motion_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t id)
 {
     struct rtgui_event_mouse emouse;
 
@@ -53,11 +53,11 @@ static void post_motion_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.x = x;
     emouse.y = y;
     emouse.ts = rt_tick_get();
-    emouse.id = ts;
+    emouse.id = id;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
 }
 
-static void post_up_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
+static void post_up_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t id)
 {
     struct rtgui_event_mouse emouse;
 
@@ -69,7 +69,7 @@ static void post_up_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.x = x;
     emouse.y = y;
     emouse.ts = rt_tick_get();
-    emouse.id = ts;
+    emouse.id = id;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
 }
 
