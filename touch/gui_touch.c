@@ -9,11 +9,8 @@
  */
 #include "touch.h"
 #include <string.h>
-
-#ifdef PKG_USING_GUIENGINE
 #include <rtgui/event.h>
 #include <rtgui/rtgui_server.h>
-#endif
 
 #ifndef PKG_TOUCH_SAMPLE_HZ
 #define PKG_TOUCH_SAMPLE_HZ    (50)
@@ -30,7 +27,6 @@
 
 static void post_down_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
 {
-#ifdef PKG_USING_GUIENGINE
     struct rtgui_event_mouse emouse;
 
     emouse.parent.sender = RT_NULL;
@@ -43,13 +39,10 @@ static void post_down_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.ts = rt_tick_get();
     emouse.id = ts;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
-
-#endif
 }
 
 static void post_motion_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
 {
-#ifdef PKG_USING_GUIENGINE
     struct rtgui_event_mouse emouse;
 
     emouse.parent.sender = RT_NULL;
@@ -62,13 +55,10 @@ static void post_motion_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.ts = rt_tick_get();
     emouse.id = ts;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
-
-#endif
 }
 
 static void post_up_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
 {
-#ifdef PKG_USING_GUIENGINE
     struct rtgui_event_mouse emouse;
 
     emouse.parent.sender = RT_NULL;
@@ -81,8 +71,6 @@ static void post_up_event(rt_uint16_t x, rt_uint16_t y, rt_tick_t ts)
     emouse.ts = rt_tick_get();
     emouse.id = ts;
     rtgui_server_post_event(&emouse.parent, sizeof(emouse));
-
-#endif
 }
 
 #define THREAD_PRIORITY   25
@@ -109,16 +97,13 @@ static void gui_touch_entry(void *parameter)
             {
             case RT_TOUCH_EVENT_UP:
                 post_up_event(read_data->x_coordinate, read_data->y_coordinate, emouse_id);
-                rt_kprintf("up %d %d %d\n", read_data->x_coordinate, read_data->y_coordinate, emouse_id);
                 break;
             case RT_TOUCH_EVENT_DOWN:
                 emouse_id = rt_tick_get();
                 post_down_event(read_data->x_coordinate, read_data->y_coordinate, emouse_id);
-                rt_kprintf("down %d %d %d\n", read_data->x_coordinate, read_data->y_coordinate, emouse_id);
                 break;
             case RT_TOUCH_EVENT_MOVE:
                 post_motion_event(read_data->x_coordinate, read_data->y_coordinate, emouse_id);
-                rt_kprintf("move %d %d %d\n", read_data->x_coordinate, read_data->y_coordinate, emouse_id);
                 break;
             default:
                 break;
@@ -142,10 +127,10 @@ static int gui_touch(void)
     rt_uint16_t x = 800;
     rt_uint16_t y = 720;
 
-    dev = rt_device_find("gt");  /* you touch device name*/
+    dev = rt_device_find("touch");  /* you touch device name*/
     if (dev == RT_NULL)
     {
-        LOG_E("can't find device:%s\n", "touch_gt");
+        LOG_E("can't find device:%s\n", "touch");
         return -1;
     }
 
