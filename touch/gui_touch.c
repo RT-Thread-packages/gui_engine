@@ -122,12 +122,9 @@ static rt_err_t rx_callback(rt_device_t dev, rt_size_t size)
     return RT_EOK;
 }
 
-static int gui_touch(void)
+int gui_touch(const char* name, rt_uint16_t x, rt_uint16_t y)
 {
-    rt_uint16_t x = 800;
-    rt_uint16_t y = 720;
-
-    dev = rt_device_find("touch");  /* you touch device name*/
+    dev = rt_device_find(name);  /* you touch device name*/
     if (dev == RT_NULL)
     {
         LOG_E("can't find device:%s\n", "touch");
@@ -164,5 +161,3 @@ static int gui_touch(void)
 
     return 0;
 }
-
-MSH_CMD_EXPORT(gui_touch, gui touch);
