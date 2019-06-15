@@ -127,7 +127,7 @@ int gui_touch(const char* name, rt_uint16_t x, rt_uint16_t y)
     dev = rt_device_find(name);  /* you touch device name*/
     if (dev == RT_NULL)
     {
-        LOG_E("can't find device:%s\n", "touch");
+        LOG_E("can't find device:%s\n", name);
         return -1;
     }
 
