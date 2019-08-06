@@ -74,10 +74,17 @@ void rtgui_dc_client_init(rtgui_widget_t *owner)
 
 struct rtgui_dc *rtgui_dc_client_create(rtgui_widget_t *owner)
 {
+    rtgui_dc_t *dc;
     /* adjudge owner */
     if (owner == RT_NULL || owner->toplevel == RT_NULL) return RT_NULL;
 
-    return RTGUI_WIDGET_DC(owner);
+    dc = RTGUI_WIDGET_DC(owner);
+    dc->draw_rect.x1 = 0;
+    dc->draw_rect.y1 = 0;
+    dc->draw_rect.x2 = 0;
+    dc->draw_rect.y2 = 0;
+
+    return dc;
 }
 
 static rt_bool_t rtgui_dc_client_fini(struct rtgui_dc *dc)
@@ -86,6 +93,13 @@ static rt_bool_t rtgui_dc_client_fini(struct rtgui_dc *dc)
 
     return RT_TRUE;
 }
+
+/* true iff (x,y) is in Rect, Copy from region.c */
+#define INRECT(r,x,y) \
+      ( ((r)->x2 > (x)) && \
+        ((r)->x1 <= (x)) && \
+        ((r)->y2 > (y)) && \
+        ((r)->y1 <= (y)) )
 
 /*
  * draw a logic point on device
@@ -104,11 +118,16 @@ static void rtgui_dc_client_draw_point(struct rtgui_dc *self, int x, int y)
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (rtgui_region_contains_point(&(owner->clip), x, y, &rect) == RT_EOK)
-    {
+    if (INRECT(&(self->draw_rect), x, y))
+        goto do_drawing;
+    else if (rtgui_region_contains_point(&(owner->clip), x, y, &(self->draw_rect)) == RT_EOK)
+        goto do_drawing;
+    else
+        return;
+
+do_drawing:
         /* draw this point */
         hw_driver->ops->set_pixel(&(owner->gc.foreground), x, y);
-    }
 }
 
 static void rtgui_dc_client_draw_color_point(struct rtgui_dc *self, int x, int y, rtgui_color_t color)
@@ -125,11 +144,16 @@ static void rtgui_dc_client_draw_color_point(struct rtgui_dc *self, int x, int y
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (rtgui_region_contains_point(&(owner->clip), x, y, &rect) == RT_EOK)
-    {
+    if (INRECT(&(self->draw_rect), x, y))
+        goto do_drawing;
+    else if (rtgui_region_contains_point(&(owner->clip), x, y, &(self->draw_rect)) == RT_EOK)
+        goto do_drawing;
+    else
+        return;
+
+do_drawing:
         /* draw this point */
         hw_driver->ops->set_pixel(&color, x, y);
-    }
 }
 
 /*
