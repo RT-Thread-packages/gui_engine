@@ -171,14 +171,26 @@ static void rtgui_hz_bitmap_font_draw_text(struct rtgui_font *font, struct rtgui
 
 static void rtgui_hz_bitmap_font_get_metrics(struct rtgui_font *font, const char *text, rtgui_rect_t *rect)
 {
+    int hzlen=0, asclen=0, ascw=8;
+    const char *sc = text;
     struct rtgui_font_bitmap *bmp_font = (struct rtgui_font_bitmap *)(font->data);
+    struct rtgui_font *asc = rtgui_font_refer("asc", 16);
+    if(asc != RT_NULL)
+        ascw = ((struct rtgui_font_bitmap *)(asc->data))->width;
 
     RT_ASSERT(bmp_font != RT_NULL);
 
+    for(; *sc != '\0'; ++sc) 
+    {
+        if((rt_uint8_t)*sc >= 0x80 && *(sc+1) != '\n') 
+            hzlen++, sc++;
+        else
+            asclen++;
+    }
     /* set metrics rect */
     rect->x1 = rect->y1 = 0;
     /* Chinese font is always fixed font */
-    rect->x2 = (rt_int16_t)(bmp_font->width * rt_strlen((const char *)text));
+    rect->x2 = (rt_int16_t)(bmp_font->width * hzlen + ascw * asclen);
     rect->y2 = bmp_font->height;
 }
 
