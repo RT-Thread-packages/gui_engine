@@ -70,6 +70,8 @@ void rtgui_dc_client_init(rtgui_widget_t *owner)
     dc = RTGUI_WIDGET_DC(owner);
     dc->type = RTGUI_DC_CLIENT;
     dc->engine = &dc_client_engine;
+    rtgui_rect_init(&(dc->draw_rect), 0, 0, 0, 0);
+    rtgui_rect_init(&(dc->invalid_rect), 0, 0, 0, 0);
 }
 
 struct rtgui_dc *rtgui_dc_client_create(rtgui_widget_t *owner)
