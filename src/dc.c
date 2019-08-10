@@ -433,6 +433,14 @@ void rtgui_dc_draw_border(struct rtgui_dc *dc, rtgui_rect_t *rect, int flag)
         rtgui_dc_draw_rect(dc, &r);
         break;
 
+    case RTGUI_BORDER_UP:
+        rtgui_dc_draw_shaded_rect(dc, &r, white, dark_grey);
+        break;
+
+    case RTGUI_BORDER_DOWN:
+        rtgui_dc_draw_shaded_rect(dc, &r, dark_grey, white);
+        break;
+
     default:
         break;
     }
