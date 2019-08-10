@@ -179,17 +179,6 @@ rt_inline rtgui_color_t rtgui_color_from_888(rt_uint32_t pixel)
     return color;
 }
 
-rt_inline rtgui_color_t lerpColor(rtgui_color_t f, rtgui_color_t b, float amount)
-{
-    int ar = RTGUI_RGB_R(f), ag = RTGUI_RGB_G(f), ab = RTGUI_RGB_B(f);
-    int br = RTGUI_RGB_R(b), bg = RTGUI_RGB_G(b), bb = RTGUI_RGB_B(b);
-    int rr = ar + amount*(br-ar);
-    int rg = ag + amount*(bg-ag);
-    int rb = ab + amount*(bb-ab);
-
-    return RTGUI_RGB(rr, rg, rb);
-}
-
 /* get the bits of specified pixle format */
 rt_uint8_t rtgui_color_get_bits(rt_uint8_t pixel_format) RTGUI_PURE;
 /* get the bytes of specified pixle format */

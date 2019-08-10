@@ -76,6 +76,7 @@ struct rtgui_dc
     /* type of device context */
     rt_uint32_t type;
     rtgui_rect_t draw_rect;
+    rtgui_rect_t invalid_rect;
     /* dc engine */
     const struct rtgui_dc_engine *engine;
 };
