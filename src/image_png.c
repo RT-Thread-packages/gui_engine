@@ -302,6 +302,20 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
 
     if (png->pixels != RT_NULL)
     {
+        rtgui_blit_line_func blit_line;
+        rt_uint8_t *line_data=RT_NULL;
+        rt_bool_t b_usebuf = RT_FALSE;
+        int hw_pixsz = rtgui_color_get_bpp(hwdev->pixel_format);
+
+        line_data = (rt_uint8_t *) rt_malloc(w * hw_pixsz);
+        if (line_data != RT_NULL) {
+            b_usebuf = RT_TRUE;
+            if (hwdev->pixel_format == RTGRAPHIC_PIXEL_FORMAT_BGR565)
+                blit_line = rtgui_blit_line_get_inv(hw_pixsz, sizeof(rtgui_color_t));
+            else
+                blit_line = rtgui_blit_line_get(hw_pixsz, sizeof(rtgui_color_t));
+        }
+
         ptr = (rtgui_color_t *)png->pixels;
         bgcolor = RTGUI_DC_BC(dc);
         bc[0] = RTGUI_RGB_R(bgcolor);
@@ -328,7 +342,10 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
                     /*
                      * Copy foreground pixel to frame buffer.
                      */
-                    rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, c);
+                    if(b_usebuf)
+                        blit_line((line_data+x*hw_pixsz), (rt_uint8_t*)ptr, sizeof(rtgui_color_t));
+                    else
+                        rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, c);
                 }
                 else
                 {
@@ -347,11 +364,22 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
                     color = RTGUI_RGB((rt_uint8_t)(fc[0] * alpha + bc[0] * (1 - alpha)),
                                       (rt_uint8_t)(fc[1] * alpha + bc[1] * (1 - alpha)),
                                       (rt_uint8_t)(fc[2] * alpha + bc[2] * (1 - alpha)));
-                    rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, color);
+                    if(b_usebuf)
+                        blit_line((line_data+x*hw_pixsz), (rt_uint8_t*)color, sizeof(rtgui_color_t));//*(rt_uint16_t*)(line_data + x*hw_pixsz) = rtgui_color_to_565(c);
+                    else
+                        rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, color);
                 }
                 /* move to next color buffer */
                 ptr ++;
             }
+            
+            if(b_usebuf) {/* use line buffer to improve efficiengy. */
+                dc->engine->blit_line(dc, rect->x1, rect->x1 + w, rect->y1 + y, (rt_uint8_t *)line_data);
+            }
+        }
+
+        if(b_usebuf) {
+            rt_free(line_data);
         }
     }
     else
