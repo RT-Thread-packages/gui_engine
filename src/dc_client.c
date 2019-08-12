@@ -43,7 +43,6 @@ static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int
 static void rtgui_dc_client_blit(struct rtgui_dc *dc, struct rtgui_point *dc_point, struct rtgui_dc *dest, rtgui_rect_t *rect);
 static rt_bool_t rtgui_dc_client_fini(struct rtgui_dc *dc);
 
-#define hw_driver               (rtgui_graphic_driver_get_default())
 #define dc_set_foreground(c)    dc->gc.foreground = c
 #define dc_set_background(c)    dc->gc.background = c
 #define _int_swap(x, y)         do {x ^= y; y ^= x; x ^= y;} while (0)
@@ -70,26 +69,38 @@ void rtgui_dc_client_init(rtgui_widget_t *owner)
     dc = RTGUI_WIDGET_DC(owner);
     dc->type = RTGUI_DC_CLIENT;
     dc->engine = &dc_client_engine;
-    rtgui_rect_init(&(dc->draw_rect), 0, 0, 0, 0);
-    rtgui_rect_init(&(dc->invalid_rect), 0, 0, 0, 0);
 }
 
 struct rtgui_dc *rtgui_dc_client_create(rtgui_widget_t *owner)
 {
-    struct rtgui_dc *dc;
+    struct rtgui_dc_client *dc;
     /* adjudge owner */
     if (owner == RT_NULL || owner->toplevel == RT_NULL) return RT_NULL;
 
-    dc = RTGUI_WIDGET_DC(owner);
-    rtgui_rect_init(&(dc->draw_rect), 0, 0, 0, 0);
-    rtgui_rect_init(&(dc->invalid_rect), 0, 0, 0, 0);
+    /* create DC */
+    dc = (struct rtgui_dc_client *) rtgui_malloc(sizeof(struct rtgui_dc_client));
+    if (dc)
+    {
+        dc->parent.type = RTGUI_DC_CLIENT;
+        dc->parent.engine = &dc_client_engine;
+        dc->owner = owner;
+        dc->hw_driver = rtgui_graphic_driver_get_default();
 
-    return dc;
+        rtgui_rect_init(&(dc->draw_rect), 0, 0, 0, 0);
+        rtgui_rect_init(&(dc->invalid_rect), 0, 0, 0, 0);
+
+        return &(dc->parent);
+    }
+
+    return RT_NULL;
 }
 
 static rt_bool_t rtgui_dc_client_fini(struct rtgui_dc *dc)
 {
     if (dc == RT_NULL || dc->type != RTGUI_DC_CLIENT) return RT_FALSE;
+
+    /* release client dc */
+    rtgui_free(dc);
 
     return RT_TRUE;
 }
@@ -126,64 +137,68 @@ int _container_include_point(rtgui_container_t *container, int x, int y, rtgui_r
  */
 static void rtgui_dc_client_draw_point(struct rtgui_dc *self, int x, int y)
 {
+    struct rtgui_dc_client *dc;
     rtgui_rect_t rect;
     rtgui_widget_t *owner;
 
-    if (self == RT_NULL) return;
+    RT_ASSERT (self != RT_NULL);
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_client *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (INBOX(&(self->draw_rect), x, y)) {
+    if (INBOX(&(dc->draw_rect), x, y)) {
         goto do_drawing;
-    } else if(INBOX(&(self->invalid_rect), x, y)) {
+    } else if(INBOX(&(dc->invalid_rect), x, y)) {
         return;
-    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(self->draw_rect)) == RT_EOK) {
+    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK) {
         goto do_drawing;
     } else {
         if(RTGUI_IS_CONTAINER(owner)) 
-            _container_include_point(RTGUI_CONTAINER(owner), x, y, &(self->invalid_rect));
+            _container_include_point(RTGUI_CONTAINER(owner), x, y, &(dc->invalid_rect));
         return;
     }
 
 do_drawing:
     /* draw this point */
-    hw_driver->ops->set_pixel(&(owner->gc.foreground), x, y);
+    dc->hw_driver->ops->set_pixel(&(owner->gc.foreground), x, y);
 }
 
 static void rtgui_dc_client_draw_color_point(struct rtgui_dc *self, int x, int y, rtgui_color_t color)
 {
+    struct rtgui_dc_client *dc;
     rtgui_rect_t rect;
     rtgui_widget_t *owner;
 
     if (self == RT_NULL) return;
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_client *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (INBOX(&(self->draw_rect), x, y)) {
+    if (INBOX(&(dc->draw_rect), x, y)) {
         goto do_drawing;
-    } else if(INBOX(&(self->invalid_rect), x, y)) {
+    } else if(INBOX(&(dc->invalid_rect), x, y)) {
         return;
-    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(self->draw_rect)) == RT_EOK) {
+    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK) {
         goto do_drawing;
     } else {
         if(RTGUI_IS_CONTAINER(owner)) 
-            _container_include_point(RTGUI_CONTAINER(owner), x, y, &(self->invalid_rect));
+            _container_include_point(RTGUI_CONTAINER(owner), x, y, &(dc->invalid_rect));
         return;
     }
 
 do_drawing:
     /* draw this point */
-    hw_driver->ops->set_pixel(&color, x, y);
+    dc->hw_driver->ops->set_pixel(&color, x, y);
 }
 
 /*
@@ -191,14 +206,16 @@ do_drawing:
  */
 static void rtgui_dc_client_draw_vline(struct rtgui_dc *self, int x, int y1, int y2)
 {
+    struct rtgui_dc_client *dc;
     register rt_base_t index;
     rtgui_widget_t *owner;
 
     if (self == RT_NULL) return;
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_client *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     x  = x + owner->extent.x1;
     y1 = y1 + owner->extent.y1;
@@ -219,7 +236,7 @@ static void rtgui_dc_client_draw_vline(struct rtgui_dc *self, int x, int y1, int
         if (prect->y2 < y2) y2 = prect->y2;
 
         /* draw vline */
-        hw_driver->ops->draw_vline(&(owner->gc.foreground), x, y1, y2);
+        dc->hw_driver->ops->draw_vline(&(owner->gc.foreground), x, y1, y2);
     }
     else
     {
@@ -240,7 +257,7 @@ static void rtgui_dc_client_draw_vline(struct rtgui_dc *self, int x, int y1, int
             if (prect->y2 < y2) draw_y2 = prect->y2;
 
             /* draw vline */
-            hw_driver->ops->draw_vline(&(owner->gc.foreground), x, draw_y1, draw_y2);
+            dc->hw_driver->ops->draw_vline(&(owner->gc.foreground), x, draw_y1, draw_y2);
         }
     }
 }
@@ -250,14 +267,16 @@ static void rtgui_dc_client_draw_vline(struct rtgui_dc *self, int x, int y1, int
  */
 static void rtgui_dc_client_draw_hline(struct rtgui_dc *self, int x1, int x2, int y)
 {
+    struct rtgui_dc_client *dc;
     register rt_base_t index;
     rtgui_widget_t *owner;
 
     if (self == RT_NULL) return;
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_cleint *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     /* convert logic to device */
     x1 = x1 + owner->extent.x1;
@@ -279,7 +298,7 @@ static void rtgui_dc_client_draw_hline(struct rtgui_dc *self, int x1, int x2, in
         if (prect->x2 < x2) x2 = prect->x2;
 
         /* draw hline */
-        hw_driver->ops->draw_hline(&(owner->gc.foreground), x1, x2, y);
+        dc->hw_driver->ops->draw_hline(&(owner->gc.foreground), x1, x2, y);
     }
     else
     {
@@ -300,13 +319,14 @@ static void rtgui_dc_client_draw_hline(struct rtgui_dc *self, int x1, int x2, in
             if (prect->x2 < x2) draw_x2 = prect->x2;
 
             /* draw hline */
-            hw_driver->ops->draw_hline(&(owner->gc.foreground), draw_x1, draw_x2, y);
+            dc->hw_driver->ops->draw_hline(&(owner->gc.foreground), draw_x1, draw_x2, y);
         }
     }
 }
 
 static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *rect)
 {
+    struct rtgui_dc_client *dc;
     rtgui_color_t foreground;
     register rt_base_t index;
     rtgui_widget_t *owner;
@@ -315,9 +335,10 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     RT_ASSERT(rect);
 
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_client *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     /* save foreground color */
     foreground = owner->gc.foreground;
@@ -337,14 +358,16 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
 
 static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int y, rt_uint8_t *line_data)
 {
+    struct rtgui_dc_client *dc;
     register rt_base_t index;
     rtgui_widget_t *owner;
 
     if (self == RT_NULL) return;
     if (!rtgui_dc_get_visible(self)) return;
+    dc = (struct rtgui_dc_client *) self;
 
     /* get owner */
-    owner = RTGUI_CONTAINER_OF(self, struct rtgui_widget, dc_type);
+    owner = dc->owner;
 
     /* convert logic to device */
     x1 = x1 + owner->extent.x1;
@@ -369,9 +392,9 @@ static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int
          * We need to adjust the offset when update widget clip!
          * Of course at ordinary times for 0. General */
         offset = owner->clip.extents.x1 - owner->extent.x1;
-        offset = offset * _UI_BITBYTES(hw_driver->bits_per_pixel);
+        offset = offset * _UI_BITBYTES(dc->hw_driver->bits_per_pixel);
         /* draw hline */
-        hw_driver->ops->draw_raw_hline(line_data + offset, x1, x2, y);
+        dc->hw_driver->ops->draw_raw_hline(line_data + offset, x1, x2, y);
     }
     else
     {
@@ -392,7 +415,7 @@ static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int
             if (prect->x2 < x2) draw_x2 = prect->x2;
 
             /* draw hline */
-            hw_driver->ops->draw_raw_hline(line_data + (draw_x1 - x1) * _UI_BITBYTES(hw_driver->bits_per_pixel), draw_x1, draw_x2, y);
+            dc->hw_driver->ops->draw_raw_hline(line_data + (draw_x1 - x1) * _UI_BITBYTES(dc->hw_driver->bits_per_pixel), draw_x1, draw_x2, y);
         }
     }
 }

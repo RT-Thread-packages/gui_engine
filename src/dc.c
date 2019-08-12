@@ -1558,10 +1558,11 @@ void rtgui_dc_set_gc(struct rtgui_dc *dc, rtgui_gc_t *gc)
     {
     case RTGUI_DC_CLIENT:
     {
-        rtgui_widget_t *owner;
-        /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
-        owner->gc = *gc;
+        struct rtgui_dc_client *dc_client;
+        
+        dc_client = (struct rtgui_dc_client *) dc;
+        RT_ASSERT(dc_client->owner != RT_NULL);
+        dc_client->owner->gc = *gc;
         break;
     }
     case RTGUI_DC_HW:
@@ -1598,10 +1599,11 @@ rtgui_gc_t *rtgui_dc_get_gc(struct rtgui_dc *dc)
     {
     case RTGUI_DC_CLIENT:
     {
-        rtgui_widget_t *owner;
-        /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
-        gc = &owner->gc;
+        struct rtgui_dc_client *dc_client;
+        
+        dc_client = (struct rtgui_dc_client *) dc;
+        RT_ASSERT(dc_client->owner != RT_NULL);
+        gc = &(dc_client->owner->gc);
         break;
     }
     case RTGUI_DC_HW:
@@ -1643,10 +1645,10 @@ rt_bool_t rtgui_dc_get_visible(struct rtgui_dc *dc)
     {
     case RTGUI_DC_CLIENT:
     {
-        rtgui_widget_t *owner;
-        /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
-        if (!RTGUI_WIDGET_IS_DC_VISIBLE(owner)) result = RT_FALSE;
+        struct rtgui_dc_client *dc_client;
+        /* get dc_client */
+        dc_client = (struct rtgui_dc_client *) dc;
+        if (!RTGUI_WIDGET_IS_DC_VISIBLE(dc_client->owner)) result = RT_FALSE;
         break;
     }
     case RTGUI_DC_HW:
@@ -1680,7 +1682,7 @@ void rtgui_dc_get_rect(struct rtgui_dc *dc, rtgui_rect_t *rect)
     {
         rtgui_widget_t *owner;
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *) dc)->owner;
         /* we should return the clipped rectangular information */
         rect->x1 = owner->clip.extents.x1 - owner->extent.x1;
         rect->y1 = owner->clip.extents.y1 - owner->extent.y1;
@@ -1761,7 +1763,7 @@ void rtgui_dc_logic_to_device(struct rtgui_dc *dc, struct rtgui_point *point)
     {
         rtgui_widget_t *owner;
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *) dc)->owner;
         point->x += owner->extent.x1;
         point->y += owner->extent.y1;
         break;
@@ -1792,8 +1794,7 @@ void rtgui_dc_rect_to_device(struct rtgui_dc *dc, struct rtgui_rect *rect)
     {
         rtgui_widget_t *owner;
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
-
+        owner = ((struct rtgui_dc_client *) dc)->owner;
         rtgui_rect_move(rect, owner->extent.x1, owner->extent.y1);
         break;
     }
@@ -1915,7 +1916,7 @@ void rtgui_dc_end_drawing(struct rtgui_dc *dc, rt_bool_t update)
 
     /* get owner */
     if (dc->type == RTGUI_DC_CLIENT)
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dc)->owner;
     else if (dc->type == RTGUI_DC_HW)
         owner = ((struct rtgui_dc_hw *)dc)->owner;
     else return ; /* bad DC type */

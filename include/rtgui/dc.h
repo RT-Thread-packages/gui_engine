@@ -75,8 +75,6 @@ struct rtgui_dc
 {
     /* type of device context */
     rt_uint32_t type;
-    rtgui_rect_t draw_rect;
-    rtgui_rect_t invalid_rect;
     /* dc engine */
     const struct rtgui_dc_engine *engine;
 };
@@ -94,6 +92,23 @@ struct rtgui_dc_hw
     struct rtgui_dc parent;
     rtgui_widget_t *owner;
     const struct rtgui_graphic_driver *hw_driver;
+};
+
+/*
+ * The client device context
+ *
+ * The client DC is a context based on client device, for examle the
+ * LCD device. The operations on the client DC are reflected to the real
+ * hardware, The difference between CLIENT and HW is that CLIENT is not flat.
+ *
+ */
+struct rtgui_dc_client
+{
+    struct rtgui_dc parent;
+    rtgui_widget_t *owner;
+    const struct rtgui_graphic_driver *hw_driver;
+    rtgui_rect_t draw_rect;
+    rtgui_rect_t invalid_rect;    
 };
 
 /**

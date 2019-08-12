@@ -524,7 +524,7 @@ static void _do_draw_line(struct rtgui_dc * dst,
         rtgui_widget_t *owner;
 
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
 
         x1 = x1 + owner->extent.x1;
         x2 = x2 + owner->extent.x1;
@@ -778,7 +778,7 @@ rtgui_dc_blend_point(struct rtgui_dc * dst, int x, int y, enum RTGUI_BLENDMODE b
         rtgui_rect_t rect;
 
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
 
         x = x + owner->extent.x1;
         y = y + owner->extent.y1;
@@ -874,7 +874,7 @@ rtgui_dc_blend_points(struct rtgui_dc *dst, const rtgui_point_t *points, int cou
         rtgui_widget_t *owner;
         rtgui_rect_t rect;
 
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
 
         for (i = 0; i < count; ++i)
         {
@@ -1439,7 +1439,7 @@ static void _do_blend_line(struct rtgui_dc * dst,
     if (dst->type == RTGUI_DC_CLIENT)
     {
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
 
         x1 = x1 + owner->extent.x1;
         x2 = x2 + owner->extent.x1;
@@ -1734,7 +1734,7 @@ rtgui_dc_blend_fill_rect(struct rtgui_dc* dst, const rtgui_rect_t *rect,
         rtgui_rect_t draw_rect;
 
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
 
         if (owner->clip.data == RT_NULL)
         {
@@ -1852,7 +1852,11 @@ rtgui_dc_blend_fill_rects(struct rtgui_dc * dst, const rtgui_rect_t *rects, int 
     if (dst->type == RTGUI_DC_CLIENT)
     {
         /* get owner */
-        owner = RTGUI_CONTAINER_OF(dst, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dst)->owner;
+    }
+    else
+    {
+        owner = ((struct rtgui_dc_hw *)dst)->owner;
     }
 
     for (i = 0; i < count; ++i)

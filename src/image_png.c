@@ -602,7 +602,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
         if (dc->type == RTGUI_DC_CLIENT)
         {
             /* get owner and calculate dx,dy */
-            owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
+            owner = ((struct rtgui_dc_client *)dc)->owner;
             dx = owner->extent.x1;
             dy = owner->extent.y1;
         }

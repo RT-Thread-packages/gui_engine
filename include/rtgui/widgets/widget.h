@@ -103,8 +103,6 @@ struct rtgui_widget
 
     /* hardware device context */
     rt_ubase_t dc_type;
-    rtgui_rect_t draw_rect;
-    rtgui_rect_t invalid_rect;
     const struct rtgui_dc_engine *dc_engine;
 
     /* the graphic context of widget */

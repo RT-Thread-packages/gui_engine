@@ -1759,7 +1759,7 @@ void rtgui_image_info_blit(struct rtgui_image_info *image, struct rtgui_dc *dc, 
         bpp = rtgui_color_get_bpp(image->src_fmt);
         hw_bpp = rtgui_color_get_bpp(hw_driver->pixel_format);
 
-        owner = RTGUI_CONTAINER_OF(dc, struct rtgui_widget, dc_type);
+        owner = ((struct rtgui_dc_client *)dc)->owner;
         rtgui_widget_rect_to_device(owner, &dest_extent);
 
         /* get intersect region clip */

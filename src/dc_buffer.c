@@ -532,7 +532,7 @@ static void rtgui_dc_buffer_blit(struct rtgui_dc *self,
             struct rtgui_rect *rects;
 
             /* get owner */
-            owner = RTGUI_CONTAINER_OF(dest, struct rtgui_widget, dc_type);
+            owner = ((struct rtgui_dc_client*)dest)->owner;
 
             dest_extent = *dest_rect;
             rtgui_widget_rect_to_device(owner, &dest_extent);
@@ -598,7 +598,7 @@ static void rtgui_dc_buffer_blit(struct rtgui_dc *self,
                 if (dest->type == RTGUI_DC_HW)
                     owner = ((struct rtgui_dc_hw*) dest)->owner;
                 else if (dest->type == RTGUI_DC_CLIENT)
-                    owner = RTGUI_CONTAINER_OF(dest, struct rtgui_widget, dc_type);
+                    owner = ((struct rtgui_dc_client*) dest)->owner;
                 else
                     RT_ASSERT(0);
 
