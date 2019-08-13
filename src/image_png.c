@@ -287,7 +287,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
     float alpha;
     rtgui_color_t color;
     rtgui_color_t c, bgcolor;
-    int fc[3], bc[4];
+    int fc[3], bc[3];
     struct rtgui_graphic_driver *hwdev = rtgui_graphic_get_device();
 
     RT_ASSERT(image != RT_NULL && dc != RT_NULL && rect != RT_NULL);
@@ -310,7 +310,8 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
 
         line_data = (rt_uint8_t *) rt_malloc(w * hw_pixsz);
         if (line_data != RT_NULL) {
-            b_usebuf = RT_TRUE;
+            /* Automatically select whether buffer is enabled or not. */
+            b_usebuf = RT_TRUE; 
             if (hwdev->pixel_format == RTGRAPHIC_PIXEL_FORMAT_BGR565)
                 blit_line = rtgui_blit_line_get_inv(hw_pixsz, bufpixsz);
             else
