@@ -2018,7 +2018,7 @@ void rtgui_dc_draw_aa_ellipse(struct rtgui_dc *dc, rt_int16_t  x, rt_int16_t y, 
     yc2 = 2 * y;
 
     sab = sqrt((double)(a2 + b2));
-    od = (rt_int16_t)lrint(sab*0.01) + 1; /* introduce some overdraw */
+    od = (rt_int16_t)lrint(sab*0.001) + 1; /* introduce some overdraw */
     dxt = (rt_int16_t)lrint((double)a2 / sab) + od;
 
     t = 0;
