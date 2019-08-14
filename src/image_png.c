@@ -158,7 +158,7 @@ static rt_bool_t rtgui_image_png_check(struct rtgui_filerw *file)
     }
     rtgui_filerw_seek(file, start, SEEK_SET);
 
-    return(is_PNG);
+    return (is_PNG);
 }
 
 static void _image_png_error_fn(png_structp png_ptr, png_const_charp error_message)
@@ -303,22 +303,22 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
     if (png->pixels != RT_NULL)
     {
         rtgui_blit_line_func blit_line;
-        rt_uint8_t *line_data=RT_NULL;
+        rt_uint8_t *line_data = RT_NULL;
         rt_bool_t b_usebuf = RT_FALSE;
         int hw_pixsz = rtgui_color_get_bpp(hwdev->pixel_format);
         int bufpixsz = sizeof(rtgui_color_t);
 
         line_data = (rt_uint8_t *) rt_malloc(w * hw_pixsz);
-        if (line_data != RT_NULL) {
+        if (line_data != RT_NULL)
+        {
             /* Automatically select whether buffer is enabled or not. */
-            b_usebuf = RT_TRUE; 
+            b_usebuf = RT_TRUE;
             if (hwdev->pixel_format == RTGRAPHIC_PIXEL_FORMAT_BGR565)
                 blit_line = rtgui_blit_line_get_inv(hw_pixsz, bufpixsz);
             else
                 blit_line = rtgui_blit_line_get(hw_pixsz, bufpixsz);
         }
 
-        ptr = (rtgui_color_t *)png->pixels;
         bgcolor = RTGUI_DC_BC(dc);
         bc[0] = RTGUI_RGB_R(bgcolor);
         bc[1] = RTGUI_RGB_G(bgcolor);
@@ -327,6 +327,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
         /* draw each point within dc */
         for (y = 0; y < h; y ++)
         {
+            ptr = (rt_uint32_t *)png->pixels + y * image->w;
             for (x = 0; x < w; x++)
             {
                 c = *ptr;
@@ -338,16 +339,16 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
                      * If the background image is already in the frame
                      * buffer, there is nothing to do.
                      */
-                    if(b_usebuf)
-                        blit_line((line_data + x*hw_pixsz), (rt_uint8_t*)&bgcolor, bufpixsz);
+                    if (b_usebuf)
+                        blit_line((line_data + x * hw_pixsz), (rt_uint8_t *)&bgcolor, bufpixsz);
                 }
                 else if (ialpha == fg_maxsample)
                 {
                     /*
                      * Copy foreground pixel to frame buffer.
                      */
-                    if(b_usebuf)
-                        blit_line((line_data + x*hw_pixsz), (rt_uint8_t*)ptr, bufpixsz);
+                    if (b_usebuf)
+                        blit_line((line_data + x * hw_pixsz), (rt_uint8_t *)ptr, bufpixsz);
                     else
                         rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, c);
                 }
@@ -368,21 +369,23 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
                     color = RTGUI_RGB((rt_uint8_t)(fc[0] * alpha + bc[0] * (1 - alpha)),
                                       (rt_uint8_t)(fc[1] * alpha + bc[1] * (1 - alpha)),
                                       (rt_uint8_t)(fc[2] * alpha + bc[2] * (1 - alpha)));
-                    if(b_usebuf)
-                        blit_line((line_data + x*hw_pixsz), (rt_uint8_t*)&color, bufpixsz);
+                    if (b_usebuf)
+                        blit_line((line_data + x * hw_pixsz), (rt_uint8_t *)&color, bufpixsz);
                     else
                         rtgui_dc_draw_color_point(dc, x + rect->x1, y + rect->y1, color);
                 }
                 /* move to next color buffer */
                 ptr ++;
             }
-            
-            if(b_usebuf) {/* use line buffer to improve efficiengy. */
+
+            if (b_usebuf) /* use line buffer to improve efficiengy. */
+            {
                 dc->engine->blit_line(dc, rect->x1, rect->x1 + w, rect->y1 + y, (rt_uint8_t *)line_data);
             }
         }
 
-        if(b_usebuf) {
+        if (b_usebuf)
+        {
             rt_free(line_data);
         }
     }
@@ -509,7 +512,7 @@ static rt_bool_t rtgui_image_png_check(struct rtgui_filerw *file)
     }
     rtgui_filerw_seek(file, start, SEEK_SET);
 
-    return(is_PNG);
+    return (is_PNG);
 }
 
 static rt_bool_t rtgui_image_png_load(struct rtgui_image *image, struct rtgui_filerw *file, rt_bool_t load)
@@ -518,8 +521,8 @@ static rt_bool_t rtgui_image_png_load(struct rtgui_image *image, struct rtgui_fi
     unsigned int height;
     unsigned int error;
 
-    rt_uint8_t* pixel;
-    rt_uint8_t* in;
+    rt_uint8_t *pixel;
+    rt_uint8_t *in;
     rt_uint32_t in_size;
 
     RT_ASSERT(image != RT_NULL);
@@ -534,7 +537,7 @@ static rt_bool_t rtgui_image_png_load(struct rtgui_image *image, struct rtgui_fi
     rtgui_filerw_read(file, in, in_size, 1);
 
     error = lodepng_decode32(&pixel, &width, &height, in, in_size);
-    if(error)
+    if (error)
     {
         rt_kprintf("lodepng decode32 error %u: %s\n", error, lodepng_error_text(error));
         rtgui_free(in);
@@ -552,10 +555,10 @@ static rt_bool_t rtgui_image_png_load(struct rtgui_image *image, struct rtgui_fi
     /* NOTE: the pixel format of PNG is ABGR888, bit0 R,G,B,A bit31 */
     /* convert pixel to ARGB888, swap B/G */
     {
-        rt_uint8_t* pixel_ptr;
-        rt_uint8_t* pixel_end;
+        rt_uint8_t *pixel_ptr;
+        rt_uint8_t *pixel_end;
 
-        pixel_ptr = (rt_uint8_t*) pixel;
+        pixel_ptr = (rt_uint8_t *) pixel;
         pixel_end = pixel_ptr + width * height * 4;
 
         while (pixel_ptr < pixel_end)
@@ -580,7 +583,7 @@ static void rtgui_image_png_unload(struct rtgui_image *image)
 
     if (image != RT_NULL)
     {
-        pixels = (rt_uint8_t*) image->data;
+        pixels = (rt_uint8_t *) image->data;
 
         /* release data */
         //rtgui_free(pixels);
@@ -652,7 +655,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
         {
             for (x = start_x; x < start_x + w; ++x)
             {
-                pixel = (rtgui_color_t*)((rt_uint8_t*)image->data + y * image->w * 4 + x * 4);
+                pixel = (rtgui_color_t *)((rt_uint8_t *)image->data + y * image->w * 4 + x * 4);
 
                 alpha = RTGUI_RGB_A(*pixel);
                 if (alpha == 0) continue;
@@ -714,7 +717,7 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
         if (dc->type == RTGUI_DC_BUFFER)
         {
             struct rtgui_dc_buffer *buffer;
-            buffer = (struct rtgui_dc_buffer*)dc;
+            buffer = (struct rtgui_dc_buffer *)dc;
 
             if (buffer->pixel_alpha == 0)
                 info.a = 255;
@@ -732,12 +735,12 @@ static void rtgui_image_png_blit(struct rtgui_image *image, struct rtgui_dc *dc,
             struct rtgui_widget *owner;
             struct rtgui_rect r;
 
-            owner = ((struct rtgui_dc_hw*)dc)->owner;
+            owner = ((struct rtgui_dc_hw *)dc)->owner;
 
             rtgui_graphic_driver_get_rect(RT_NULL, &r);
 
             /* blit destination */
-            info.dst = (rt_uint8_t*)hw_driver->framebuffer;
+            info.dst = (rt_uint8_t *)hw_driver->framebuffer;
             info.dst = info.dst + (owner->extent.y1 + dst_y) * hw_driver->pitch +
                        (owner->extent.x1 + dst_x) * rtgui_color_get_bpp(hw_driver->pixel_format);
             info.dst_fmt = hw_driver->pixel_format;
