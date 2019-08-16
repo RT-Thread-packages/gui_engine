@@ -346,21 +346,21 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     /* set background color as foreground color */
     owner->gc.foreground = owner->gc.background;
 
-    if(rtgui_rect_is_equal(rect, &owner->extent))
-	{
+    if (rtgui_rect_is_equal(rect, &owner->extent))
+    {
         int i, nums;
-		rtgui_rect_t *rects;
-		rects = rtgui_region_rectangles(&(owner->clip), &nums);
+        rtgui_rect_t *rects;
+        rects = rtgui_region_rectangles(&(owner->clip), &nums);
 
-		for(i = 0; i < nums; i ++)
-		{
-			for (index = rects[i].y1; index < rects[i].y2; index ++)
+        for(i = 0; i < nums; i ++)
+        {
+            for (index = rects[i].y1; index < rects[i].y2; index ++)
             {
-			    /* draw hline */
-			    dc->hw_driver->ops->draw_hline(&foreground, rects[i].x1, rects[i].x2, index);
+                /* draw hline */
+                dc->hw_driver->ops->draw_hline(&foreground, rects[i].x1, rects[i].x2, index);
             }
-		}
-	}
+        }
+    }
     else
     {
         /* fill rect */
