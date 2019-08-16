@@ -76,6 +76,7 @@ rtgui_region_status_t rtgui_region_inverse(rtgui_region_t *newReg, rtgui_region_
 int rtgui_region_num_rects(rtgui_region_t *region);
 
 rtgui_rect_t *rtgui_region_rects(rtgui_region_t *region);
+rtgui_rect_t *rtgui_region_rectangles(rtgui_region_t *region, int *n_rects);
 
 #define RTGUI_REGION_OUT    0
 #define RTGUI_REGION_IN     1

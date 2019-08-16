@@ -215,6 +215,14 @@ rtgui_rect_t *rtgui_region_rects(rtgui_region_t *region)
     return PIXREGION_RECTS(region);
 }
 
+rtgui_rect_t *rtgui_region_rectangles(rtgui_region_t *region, int *n_rects)
+{
+    if (n_rects)
+        *n_rects = PIXREGION_NUM_RECTS(region);
+
+    return PIXREGION_RECTS(region);
+}
+
 static rtgui_region_status_t rtgui_break(rtgui_region_t *region)
 {
     freeData(region);
