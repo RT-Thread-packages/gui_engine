@@ -343,6 +343,8 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     struct rtgui_dc_client *dc;
     rtgui_color_t foreground;
     register rt_base_t index;
+    struct rtgui_rect *rects, draw_rect = *rect;
+    int i, nums;
     rtgui_widget_t *owner;
 
     RT_ASSERT(self);
@@ -355,16 +357,13 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     owner = dc->owner;
 
     /* save foreground color */
-    foreground = owner->gc.foreground;
+    foreground = owner->gc.background;
 
-    /* set background color as foreground color */
-    owner->gc.foreground = owner->gc.background;
+    /* do not destroy *rect, using draw_rect */
+    rtgui_widget_rect_to_device(owner, &draw_rect);
 
-    rtgui_widget_rect_to_device(owner, rect);
-    if (rtgui_rect_is_equal(rect, &owner->extent))
+    if (rtgui_rect_is_equal(&draw_rect, &owner->extent) == RT_EOK)
     {
-        int i, nums;
-        rtgui_rect_t *rects;
         rects = rtgui_region_rectangles(&(owner->clip), &nums);
 
         for (i = 0; i < nums; i ++)
@@ -378,14 +377,22 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     }
     else
     {
-        /* fill rect */
-        for (index = rect->y1; index < rect->y2; index ++)
+        rects = rtgui_region_rectangles(&(owner->clip), &nums);
+
+        for (i = 0; i < nums; i ++)
         {
-            rtgui_dc_client_draw_hline(self, rect->x1, rect->x2, index);
+            draw_rect = *rect;
+            if (rtgui_rect_is_intersect(&rects[i], &draw_rect) == RT_EOK)
+            {
+                rtgui_rect_intersect(&rects[i], &draw_rect);
+                for (index = draw_rect.y1; index < draw_rect.y2; index ++)
+                {
+                    /* draw hline */
+                    dc->hw_driver->ops->draw_hline(&foreground, draw_rect.x1, draw_rect.x2, index);
+                }
+            }
         }
     }
-    /* restore foreground color */
-    owner->gc.foreground = foreground;
 }
 
 static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int y, rt_uint8_t *line_data)
@@ -421,8 +428,8 @@ static void rtgui_dc_client_blit_line(struct rtgui_dc *self, int x1, int x2, int
         if (prect->x2 < x2) x2 = prect->x2;
 
         /* patch note:
-         * We need to adjust the offset when update widget clip!
-         * Of course at ordinary times for 0. General */
+            * We need to adjust the offset when update widget clip!
+            * Of course at ordinary times for 0. General */
         offset = owner->clip.extents.x1 - owner->extent.x1;
         offset = offset * _UI_BITBYTES(dc->hw_driver->bits_per_pixel);
         /* draw hline */
