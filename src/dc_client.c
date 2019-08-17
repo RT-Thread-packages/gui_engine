@@ -360,6 +360,7 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     /* set background color as foreground color */
     owner->gc.foreground = owner->gc.background;
 
+    rtgui_widget_rect_to_device(owner, rect);
     if (rtgui_rect_is_equal(rect, &owner->extent))
     {
         int i, nums;
