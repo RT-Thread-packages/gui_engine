@@ -122,7 +122,7 @@ int _container_include_point(rtgui_container_t *container, int x, int y, rtgui_r
     {
         w = rtgui_list_entry(node, rtgui_widget_t, sibling);
 
-        if(INBOX(&(w->extent), x, y))
+        if (INBOX(&(w->extent), x, y))
         {
             *rect = w->extent;
             return RT_TRUE;
@@ -141,7 +141,7 @@ static void rtgui_dc_client_draw_point(struct rtgui_dc *self, int x, int y)
     rtgui_rect_t rect;
     rtgui_widget_t *owner;
 
-    RT_ASSERT (self != RT_NULL);
+    RT_ASSERT(self != RT_NULL);
     if (!rtgui_dc_get_visible(self)) return;
     dc = (struct rtgui_dc_client *) self;
 
@@ -151,14 +151,21 @@ static void rtgui_dc_client_draw_point(struct rtgui_dc *self, int x, int y)
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (INBOX(&(dc->draw_rect), x, y)) {
+    if (INBOX(&(dc->draw_rect), x, y))
+    {
         goto do_drawing;
-    } else if(INBOX(&(dc->invalid_rect), x, y)) {
+    }
+    else if (INBOX(&(dc->invalid_rect), x, y))
+    {
         return;
-    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK) {
+    }
+    else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK)
+    {
         goto do_drawing;
-    } else {
-        if(RTGUI_IS_CONTAINER(owner)) 
+    }
+    else
+    {
+        if (RTGUI_IS_CONTAINER(owner))
             _container_include_point(RTGUI_CONTAINER(owner), x, y, &(dc->invalid_rect));
         return;
     }
@@ -184,14 +191,21 @@ static void rtgui_dc_client_draw_color_point(struct rtgui_dc *self, int x, int y
     x = x + owner->extent.x1;
     y = y + owner->extent.y1;
 
-    if (INBOX(&(dc->draw_rect), x, y)) {
+    if (INBOX(&(dc->draw_rect), x, y))
+    {
         goto do_drawing;
-    } else if(INBOX(&(dc->invalid_rect), x, y)) {
+    }
+    else if (INBOX(&(dc->invalid_rect), x, y))
+    {
         return;
-    } else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK) {
+    }
+    else if (rtgui_region_contains_point(&(owner->clip), x, y, &(dc->draw_rect)) == RT_EOK)
+    {
         goto do_drawing;
-    } else {
-        if(RTGUI_IS_CONTAINER(owner)) 
+    }
+    else
+    {
+        if (RTGUI_IS_CONTAINER(owner))
             _container_include_point(RTGUI_CONTAINER(owner), x, y, &(dc->invalid_rect));
         return;
     }
@@ -352,7 +366,7 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
         rtgui_rect_t *rects;
         rects = rtgui_region_rectangles(&(owner->clip), &nums);
 
-        for(i = 0; i < nums; i ++)
+        for (i = 0; i < nums; i ++)
         {
             for (index = rects[i].y1; index < rects[i].y2; index ++)
             {
