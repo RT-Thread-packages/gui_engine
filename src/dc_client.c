@@ -356,7 +356,7 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
     /* get owner */
     owner = dc->owner;
 
-    /* save foreground color */
+    /* filled color */
     foreground = owner->gc.background;
 
     /* do not destroy *rect, using draw_rect */
