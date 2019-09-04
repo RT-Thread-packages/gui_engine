@@ -406,7 +406,7 @@ rt_inline int readbyte(int fd, unsigned char *cp)
 {
     unsigned char buf[1];
 
-    if (read(fd, buf, 1) != 1)
+    if (read(fd, buf, 1) == -1)
         return 0;
     *cp = buf[0];
     return 1;
