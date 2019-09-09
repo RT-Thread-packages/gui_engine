@@ -381,14 +381,14 @@ static void rtgui_dc_client_fill_rect(struct rtgui_dc *self, struct rtgui_rect *
 
         for (i = 0; i < nums; i ++)
         {
-            draw_rect = *rect;
-            if (rtgui_rect_is_intersect(&rects[i], &draw_rect) == RT_EOK)
+            struct rtgui_rect dr = draw_rect;
+            if (rtgui_rect_is_intersect(&rects[i], &dr) == RT_EOK)
             {
-                rtgui_rect_intersect(&rects[i], &draw_rect);
-                for (index = draw_rect.y1; index < draw_rect.y2; index ++)
+                rtgui_rect_intersect(&rects[i], &dr);
+                for (index = dr.y1; index < dr.y2; index ++)
                 {
                     /* draw hline */
-                    dc->hw_driver->ops->draw_hline(&foreground, draw_rect.x1, draw_rect.x2, index);
+                    dc->hw_driver->ops->draw_hline(&foreground, dr.x1, dr.x2, index);
                 }
             }
         }
