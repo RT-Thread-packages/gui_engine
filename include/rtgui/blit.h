@@ -54,10 +54,18 @@ extern "C" {
 #endif
 
 /* Assemble R-G-B values into a specified pixel format and store them */
+#ifdef RTGUI_RGB565_CHANGE_ENDIAN
+#define RGB565_FROM_RGB(Pixel, r, g, b)                                 \
+{                                                                       \
+    Pixel = (((r>>3)<<3)|((g>>5)|((g>>2)<<13))|((b>>3)<<8));            \
+}
+#else
 #define RGB565_FROM_RGB(Pixel, r, g, b)                                 \
 {                                                                       \
     Pixel = ((r>>3)<<11)|((g>>2)<<5)|(b>>3);                            \
 }
+#endif
+
 #define BGR565_FROM_RGB(Pixel, r, g, b)                                 \
 {                                                                       \
     Pixel = ((b>>3)<<11)|((g>>2)<<5)|(r>>3);                            \
@@ -108,12 +116,23 @@ extern "C" {
 }
 
 /* Load pixel of the specified format from a buffer and get its R-G-B values */
+#ifdef RTGUI_RGB565_CHANGE_ENDIAN
+#define RGB_FROM_RGB565(Pixel, r, g, b)                                                                               \
+    {                                                                                                                 \
+    rt_uint16_t swap_data = (((Pixel & 0x00ff) << 8) + ((Pixel & 0xff00) >> 8));                                      \
+    r = rtgui_blit_expand_byte[3][((swap_data&0xF800)>>11)];                                                          \
+    g = rtgui_blit_expand_byte[2][((swap_data&0x07E0)>>5)];                                                           \
+    b = rtgui_blit_expand_byte[3][(swap_data&0x001F)];                                                                \
+}
+#else
 #define RGB_FROM_RGB565(Pixel, r, g, b)                                 \
     {                                                                   \
     r = rtgui_blit_expand_byte[3][((Pixel&0xF800)>>11)];                \
     g = rtgui_blit_expand_byte[2][((Pixel&0x07E0)>>5)];                 \
     b = rtgui_blit_expand_byte[3][(Pixel&0x001F)];                      \
 }
+#endif
+
 #define RGB_FROM_BGR565(Pixel, r, g, b)                                 \
     {                                                                   \
     b = rtgui_blit_expand_byte[3][((Pixel&0xF800)>>11)];                \

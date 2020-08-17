@@ -114,13 +114,16 @@ rt_inline rtgui_color_t rtgui_color_from_mono(rt_uint8_t pixel)
     return color;
 }
 
+
 /* convert rtgui color to RRRRRGGGGGGBBBBB */
 rt_inline rt_uint16_t rtgui_color_to_565(rtgui_color_t c)
 {
     rt_uint16_t pixel;
-
+#ifdef RTGUI_RGB565_CHANGE_ENDIAN
+    pixel = (rt_uint16_t)(((RTGUI_RGB_R(c) >> 3) << 3) | (((RTGUI_RGB_G(c) >> 5) | ((RTGUI_RGB_G(c) >> 2) << 13))) | ((RTGUI_RGB_B(c) >> 3) << 8));
+#else
     pixel = (rt_uint16_t)(((RTGUI_RGB_R(c) >> 3) << 11) | ((RTGUI_RGB_G(c) >> 2) << 5) | (RTGUI_RGB_B(c) >> 3));
-
+#endif
     return pixel;
 }
 
@@ -128,7 +131,9 @@ rt_inline rtgui_color_t rtgui_color_from_565(rt_uint16_t pixel)
 {
     rt_uint16_t r, g, b;
     rtgui_color_t color;
-
+#ifdef RTGUI_RGB565_CHANGE_ENDIAN
+    pixel = (((pixel & 0x00ff) << 8) + ((pixel & 0xff00) >> 8));
+#endif
     r = (pixel >> 11) & 0x1f;
     g = (pixel >> 5)  & 0x3f;
     b = pixel & 0x1f;
