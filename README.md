@@ -1,33 +1,35 @@
 # GUI Engine
 
-## 1、介绍
+[中文页](README_ZH.md) | English
 
-GUI engine是一套基本的绘图引擎，由C代码编写而成。
+## 1. Introduction
 
-主要的功能包括：
-- 基于绘图设备DC的绘图操作，包括点，线，圆，椭圆，多边形（填充）等；
-- 各类图像格式加载（从文件系统中加载，需要DFS文件系统）及绘图；
-- 各种字体的文本显示；
-- GUI的C/S架构及基础的窗口机制，事件框架机制等。
+GUI engine is a set of basic drawing engine, written by C code.
 
-## 2、获取方式
+The main functions include:
+- Drawing operations based on the drawing device DC, including points, lines, circles, ellipses, polygons (filling), etc.;
+- Various image format loading (loading from file system, DFS file system is required) and drawing;
+- Text display in various fonts;
+- GUI C/S structure and basic window mechanism, event frame mechanism, etc.
 
--  Git方式获取：
+## 2. How to obtain
 
-    git clone https://github.com/RT-Thread-packages/gui_engine.git
+- Obtain by Git:
 
-- env工具辅助下载：
+     git clone https://github.com/RT-Thread-packages/gui_engine.git
 
-menuconfig package path：
+- env tool to assist download:
 
-    RT-Thread online package
-        system package
-            [*] RT-Thread UI Engine
-                [*] Enable UI Engine
+menuconfig package path:
 
-## 3、示例介绍
+     RT-Thread online package
+         system package
+             [*] RT-Thread UI Engine
+                 [*] Enable UI Engine
 
-### 3.1 获取示例
+## 3. Example introduction
 
-* 配置使能示例选项 `Enable the example of Gui Engine`
-* 配置包版本选为最新版 `latest`
+### 3.1 Get examples
+
+* Configure the enable example option `Enable the example of Gui Engine`
+* The configuration package version is selected as the latest version `latest`
