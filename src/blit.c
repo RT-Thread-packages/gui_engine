@@ -1706,36 +1706,6 @@ void rtgui_blit(struct rtgui_blit_info *info)
             break;
         }
     }
-    else if (info->src_fmt == RTGRAPHIC_PIXEL_FORMAT_ALPHA)
-    {
-        switch (info->dst_fmt)
-        {
-        case RTGRAPHIC_PIXEL_FORMAT_RGB565:
-            BlitAlphatoRGB565PixelAlpha(info);
-            break;
-        case RTGRAPHIC_PIXEL_FORMAT_RGB888:
-            BlitAlphatoRGB888PixelAlpha(info);
-            break;
-        case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
-            BlitAlphatoARGB888PixelAlpha(info);
-            break;
-        }
-    }
-    else if (info->src_fmt == RTGRAPHIC_PIXEL_FORMAT_COLOR)
-    {
-        switch (info->dst_fmt)
-        {
-        case RTGRAPHIC_PIXEL_FORMAT_RGB565:
-            BlitAlphaColortoRGB565PixelAlpha(info);
-            break;
-        case RTGRAPHIC_PIXEL_FORMAT_RGB888:
-            BlitAlphaColortoRGB888PixelAlpha(info);
-            break;
-        case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
-            BlitAlphaColortoARGB888PixelAlpha(info);
-            break;
-        }
-    }
 }
 RTM_EXPORT(rtgui_blit);
 
